@@ -1,69 +1,169 @@
 import openpyxl 
+import csv
+import array
+import discord
 workbook = openpyxl.load_workbook('BotC-Stats.xlsx')
 sheet = workbook.active
 def main() -> None: 
-    return None
+    client = setupDiscord()
+    @client.event
+    async def on_ready():
+        print(f'Running as {client.user}')
 
-def FindPlayer(player: str) -> chr:
-    match player:
-        case "Oliver":
-            return "I"
-        case "Sophie":
-            return "N"
-        case "Ethan":
-            return "S"
-        case "Richard":
-            return "X"
-        case "Dan":
-            return "AC"
-        case "Callum":
-            return "AH"
-        case "Ryan":
-            return "AM"
-        case "Stuart":
-            return "Ant"
-        case "Ronnie":
-            return "BB"
-        case "Ian":
-            return "BG"
-        case "Reuben":
-            return "BL"
-        case "Findlay":
-            return "BQ"
-        case "Daniel":
-            return "BV"
-        case "Emily":
-            return "CA"
-        case "Laurence":
-            return "CF"
-        case "BenN":
-            return "CK"
-        case "BenS":
-            return "CP"
-        case "Andy":
-            return "CU"
-        case "Ben3":
-            return "CZ"
-        case "Carrick":
-            return "DE"
-        case "Connor":
-            return "DJ"
-        case "Drystan":
-            return "DO"
-        case "Heather":
-            return "DT"
-        case "Etienne":
-            return "DY"
-        case "Liv":
-            return "ED"
-        case "Rory":
-            return "EI"
-        case "Scott":
-            return "EN"
-        case "TJ":
-            return "ES"
+    @client.event
+    async def on_message(message):
+        checkMessage(client,message)
+
+
+    client.run('MTMwMzcxOTAwOTc5NTA0NzUyNg.Go9fCh.HTWyggF4jheVsZLmvOFhkdPW7TAuzI1p-jfmCI')
+
+def setupDiscord() -> discord.client:
+    intents = discord.Intents.default()
+    intents.message_content = True
+    client = discord.Client(intents=intents)
+    return client
+    
+def checkMessage(client: discord.client,message: discord.message) -> None:
+    if message.author == client.user:
+            return
+    if message.content.startswith('!PersonalAverageStats'):
+        PersonalAverage()
+
+async def PersonalAverage(client: discord.client,message: discord.message)-> None:
+    Poster = message.author
+    SearchColumn = GetPlayerFromDiscord(Poster.name)
+    TotalGood = sheet.cell(row=102, column=SearchColumn).value
+    TotalEvil = sheet.cell(row=156, column=SearchColumn).value
+    Total = sheet.cell(row=157, column=SearchColumn).value
+    await message.channel.send('Your average winrate is ' + Total + ' consisting of ' + TotalGood + ' whilst good and ' + TotalEvil + ' whilst evil!')
+
+def GetPlayerFromDiscord(name: str) -> str:
+    match name:
+        case "slane3470":
+            return 9
+        case ".celari":
+            return 14
+        case "dadude":
+            return 19
+        case "draconic_lord":
+            return 24
+        case "thereligionofpeanut":
+            return 29
+        case "orourkustortoise":
+            return 34
+        case "toomai1970":
+            return 39
+        case "lazyvult":
+            return 44 
+        case "antinium1312.":
+            return 49
+        case "brotatornator666":
+            return 54
+        case "ianoid":
+            return 59
+        case "roobinski":
+            return 64
+        case "bossors":
+            return 69
+        case "tsarplatinum":
+            return 74
+        case "ordainedtick266":
+            return 79
+        case "hamsternaut":
+            return 84
+        case ".defize":
+            return 89
+        case "._._neon_._.":
+            return 94
+        case "vandyss":
+            return 99
+        case "brob5046":
+            return 104
+        case "benign_skies":
+            return 109
+        case "cgotnr":
+            return 114
+        case "seventyseven_77":
+            return 119
+        case "trees17":
+            return 124
+        case "jetotavio":
+            return 129
+        case "livburrowss":
+            return 134
+        case "sincerenumber82":
+            return 139
+        case "withasideofsalt":
+            return 144
+        case "thorijus":
+            return 149
         case _: #Error if not found player
-            return "ERROR"
+            return 0
+        
+def FindPlayer(player: str) -> int:
+    match player:
+        case "Total":
+            return 4
+        case "Oliver":
+            return 9
+        case "Sophie":
+            return 14
+        case "Ethan":
+            return 19
+        case "Richard":
+            return 24
+        case "Dan":
+            return 29
+        case "Callum":
+            return 34
+        case "Ryan":
+            return 39
+        case "Stuart":
+            return 44 
+        case "Ant":
+            return 49
+        case "Ronnie":
+            return 54
+        case "Ian":
+            return 59
+        case "Reuben":
+            return 64
+        case "Findlay":
+            return 69
+        case "Daniel":
+            return 74
+        case "Emily":
+            return 79
+        case "Laurence":
+            return 84
+        case "BenN":
+            return 89
+        case "BenS":
+            return 94
+        case "Andy":
+            return 99
+        case "Ben3":
+            return 104
+        case "Carrick":
+            return 109
+        case "Connor":
+            return 114
+        case "Drystan":
+            return 119
+        case "Heather":
+            return 124
+        case "Etienne":
+            return 129
+        case "Liv":
+            return 134
+        case "Rory":
+            return 139
+        case "Scott":
+            return 144
+        case "TJ":
+            return 149
+        case _: #Error if not found player
+            return 0
         
 def FindRole(Role: str) -> int:
     match Role:
@@ -204,6 +304,8 @@ def FindRole(Role: str) -> int:
             return 71
         case "Washerwoman":
             return 72
+        case "Townsfolk":
+            return 73
         #Outsiders
         case "Barber":
             return 77
@@ -249,6 +351,8 @@ def FindRole(Role: str) -> int:
             return 97
         case "Zealot":
             return 98
+        case "Outsider":
+            return 99
         #Minions
         case "Assassin":
             return 106
@@ -298,6 +402,8 @@ def FindRole(Role: str) -> int:
             return 128
         case "Witch":
             return 129
+        case "Minion":
+            return 130
         #Demons
         case "Al-Hadikhia":
             return 134
@@ -337,28 +443,78 @@ def FindRole(Role: str) -> int:
             return 134
         case "Zombuul":
             return 134
+        case "Demon":
+            return 135
+        #Totals
+        case "Total Good":
+            return 102
+        case "Total Evil":
+            return 156
+        case "Total":
+            return 157
         #Error case if not found
         case _:
             return 0
         
         
+def separateFile() -> array:
+    with open('results.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        Data = array('w')
+        for row in reader:
+            Data.append(row)
+        return Data
 
-        
+def replacePlayerArray(Player: array) ->array:
+    FixedPlayer = array('L')
+    for entry in Player:
+        FixedPlayer.append(FindPlayer(entry))
+    return FixedPlayer
 
-def updateGoodStat(column: chr, row: int, good_win: bool) -> None:
+def replaceRoleArray(Role: array) ->array:
+    FixedRole = array('L')
+    for entry in Role:
+        FixedRole.append(FindRole(entry))
+    return FixedRole
+
+def updateGoodStat(searchcolumn: int, searchrow: int, good_win: bool) -> None:
     if(not(good_win)): #since good has not won increment lost instead of win
-        column=chr(ord(column)+1)
-    cell = str(column) + str(row)
-    incremented_data = sheet.cell().value + 1
-    sheet[cell] = incremented_data
+        searchcolumn += 1
+    searchedcell = sheet.cell(row = searchrow, column= searchcolumn)
+    searchedcell.value = searchedcell.value + 1
 
-def updateEvilStat(column: chr, row: int, good_win: bool) -> None:
+def updateEvilStat(searchcolumn: int, searchrow: int, good_win: bool) -> None:
     if(good_win): #since good has won evil has not and thus must increment lost instead
-        column=chr(ord(column)+1)
-    cell = str(column) + str(row)
-    incremented_data = sheet.cell().value + 1
-    sheet[cell] = incremented_data
+        searchcolumn += 1
+    searchedcell = sheet.cell(row = searchrow, column= searchcolumn)
+    searchedcell.value = searchedcell.value + 1
 
+def updateStats(Data: array) -> None:
+    i = 0
+    Player = array('w')
+    Role = array('w')
+    for entry in Data:
+        if(i == 0):
+            good_win = entry
+        elif(i % 2 == 0):
+            Player.append()
+        else:
+            Role.append()
+        i += 1
+    i = 0
+    searchcolumn = replacePlayerArray
+    searchrow = replaceRoleArray
+    for entry in searchrow:
+        if(searchrow[i] >= 106):
+            updateEvilStat(searchcolumn[i],searchrow[i],good_win)
+        else:
+            updateGoodStat(searchcolumn[i],searchrow[i],good_win)
+        i += 1
+
+def getPlayerStats(Player: str, Role: str):
+    searchcolumn = FindPlayer(Player)
+    searchrow = FindRole(Role)
+    searchedcell = sheet.cell(row = searchrow, column= searchcolumn)
 
 def saveAndClose() -> None:
     workbook.save('BotC-Stats.xlsx')
