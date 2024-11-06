@@ -485,23 +485,24 @@ def separateFile() -> array:
 def replacePlayerArray(Player: array) ->array:
     FixedPlayer = []
     for entry in Player:
-        FixedPlayer.append(FindPlayer(entry))
+        player = entry[0]
+        FixedPlayer.append(FindPlayer(player))
     return FixedPlayer
 
 def replaceRoleArray(Role: array) ->array:
     FixedRole = []
     for entry in Role:
-        FixedRole.append(FindRole(entry))
+        role = entry[0]
+        FixedRole.append(FindRole(role))
     return FixedRole
 
 def updateGoodStat(searchcolumn: int, searchrow: int, good_win: bool) -> None:
     if(not(good_win)): #since good has not won increment lost instead of win
         searchcolumn=chr(ord(searchcolumn)+1)
     cell = str(searchcolumn) + str(searchrow)
-    print(cell)
     value = sheet[cell].value
     value += 1
-    sheet[cell] = value
+    sheet[cell].value = value
     workbook.save()
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
     
@@ -510,10 +511,9 @@ def updateEvilStat(searchcolumn: int, searchrow: int, good_win: bool) -> None:
     if(good_win): #since good has won evil has not and thus must increment lost instead
         searchcolumn=chr(ord(searchcolumn)+1)
     cell = str(searchcolumn) + str(searchrow)
-    print(cell)
     value = sheet[cell].value
     value += 1
-    sheet[cell] = value
+    sheet[cell].value = value
     workbook.save()
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
 
@@ -525,10 +525,9 @@ def updateStats(Data: array) -> None:
         if(i == 0):
             good_win = entry
         elif(i % 2 == 0):
-            Role.append(str(entry))
+            Role.append(entry)
         else:
-            Player.append(str(entry))
-        print(entry)
+            Player.append(entry)
         i += 1
     i = 0
     searchcolumn = replacePlayerArray(Player)
@@ -542,4 +541,4 @@ def updateStats(Data: array) -> None:
     Total = sheet['H5'].value
     print(Total)
 
-bot.run('MTMwMzcxOTAwOTc5NTA0NzUyNg.Go9fCh.HTWyggF4jheVsZLmvOFhkdPW7TAuzI1p-jfmCI')
+bot.run('MTMwMzcxOTAwOTc5NTA0NzUyNg.GWHdIn.4qN6deiWx2QhX6rsC-YBQlPTeAjOKcMK90dbqM')
