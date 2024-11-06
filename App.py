@@ -2,14 +2,12 @@ import xlwings as xw
 import csv
 import array
 import discord
-from discord import interactions
+from discord import app_commands
 from discord.ext import commands
 from pathlib import Path
 
 #------bot stuff--------
-intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix='/', intents=intents)
+bot = commands.Bot(command_prefix='!', intents = discord.Intents.all())
 workbook = xw.Book('BotC-Stats.xlsx')
 sheet = workbook.sheets['Sheet1']
 
@@ -29,13 +27,16 @@ guild = discord.Object(id='1303745588302708807')
 @commands.is_owner()  # Prevent other people from using the command
 async def sync(ctx: commands.Context) -> None:
     """Sync app commands to Discord."""
-    await ctx.bot.tree.sync()
-    await ctx.send('Application commands synchronized!')
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} command(s)")
+    except Exception as e:
+        print(e)
+    
 
-@bot.command(name="personalaverage",description="Shows Average winrates")
-async def personalaverage(ctx)-> None:
-    """Shows Average Win Rate."""
-    searchcolumn = GetPlayerFromDiscord(ctx.author.name)
+@bot.tree.command(name="personalaverage")
+async def personalaverage(interaction: discord.Interaction):
+    searchcolumn = GetPlayerFromDiscord(interaction.user.name)
     searchcolumn=chr(ord(searchcolumn)+2)
     cell = str(searchcolumn)+str(102)
     TotalGood = sheet[cell].value
@@ -43,10 +44,11 @@ async def personalaverage(ctx)-> None:
     TotalEvil = sheet[cell].value
     cell = str(searchcolumn)+str(157)
     Total = sheet[cell].value
-    await ctx.send('Your average winrate is ' + str(Total) + ' consisting of ' + str(TotalGood) + ' whilst good and ' + str(TotalEvil) + ' whilst evil!')
+    await interaction.response.send_message(f"Your average winrate is {str(Total)} consisting of {str(TotalGood)} whilst good and {str(TotalEvil)} whilst evil!", ephemeral=True)
+
 
 @commands.is_owner()  # Prevent other people from using the command
-@bot.command(name="updatespreadsheet", description="if program has a csv file it uses it to update the spreadsheet")
+@bot.tree.command(name="updatespreadsheet", description="if program has a csv file it uses it to update the spreadsheet")
 async def updatespreadsheet(ctx)-> None:
     my_file = Path("Results.csv")
     if my_file.is_file():
