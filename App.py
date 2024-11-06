@@ -1,169 +1,186 @@
-import openpyxl 
+import xlwings as xw
 import csv
 import array
 import discord
-workbook = openpyxl.load_workbook('BotC-Stats.xlsx')
-sheet = workbook.active
-def main() -> None: 
-    client = setupDiscord()
-    @client.event
-    async def on_ready():
-        print(f'Running as {client.user}')
+from discord import interactions
+from discord.ext import commands
+from pathlib import Path
 
-    @client.event
-    async def on_message(message):
-        checkMessage(client,message)
+#------bot stuff--------
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix='/', intents=intents)
+workbook = xw.Book('BotC-Stats.xlsx')
+sheet = workbook.sheets['Sheet1']
 
 
-    client.run('MTMwMzcxOTAwOTc5NTA0NzUyNg.Go9fCh.HTWyggF4jheVsZLmvOFhkdPW7TAuzI1p-jfmCI')
+class MyCog(commands.Cog):
+  def __init__(self, bot: commands.Bot) -> None:
+    self.bot = bot
 
-def setupDiscord() -> discord.client:
-    intents = discord.Intents.default()
-    intents.message_content = True
-    client = discord.Client(intents=intents)
-    return client
-    
-def checkMessage(client: discord.client,message: discord.message) -> None:
-    if message.author == client.user:
-            return
-    if message.content.startswith('!PersonalAverageStats'):
-        PersonalAverage()
+@bot.event
+async def on_ready():
+    print(f'Running as {bot.user}')
+    print(bot.user.id)
 
-async def PersonalAverage(client: discord.client,message: discord.message)-> None:
-    Poster = message.author
-    SearchColumn = GetPlayerFromDiscord(Poster.name)
-    TotalGood = sheet.cell(row=102, column=SearchColumn).value
-    TotalEvil = sheet.cell(row=156, column=SearchColumn).value
-    Total = sheet.cell(row=157, column=SearchColumn).value
-    await message.channel.send('Your average winrate is ' + Total + ' consisting of ' + TotalGood + ' whilst good and ' + TotalEvil + ' whilst evil!')
+guild = discord.Object(id='1303745588302708807')
+@bot.command()
+@commands.guild_only()
+@commands.is_owner()  # Prevent other people from using the command
+async def sync(ctx: commands.Context) -> None:
+    """Sync app commands to Discord."""
+    await ctx.bot.tree.sync()
+    await ctx.send('Application commands synchronized!')
+
+@bot.command(name="personalaverage",description="Shows Average winrates")
+async def personalaverage(ctx)-> None:
+    """Shows Average Win Rate."""
+    searchcolumn = GetPlayerFromDiscord(ctx.author.name)
+    searchcolumn=chr(ord(searchcolumn)+2)
+    cell = str(searchcolumn)+str(102)
+    TotalGood = sheet[cell].value
+    cell = str(searchcolumn)+str(156)
+    TotalEvil = sheet[cell].value
+    cell = str(searchcolumn)+str(157)
+    Total = sheet[cell].value
+    await ctx.send('Your average winrate is ' + str(Total) + ' consisting of ' + str(TotalGood) + ' whilst good and ' + str(TotalEvil) + ' whilst evil!')
+
+@commands.is_owner()  # Prevent other people from using the command
+@bot.command(name="updatespreadsheet", description="if program has a csv file it uses it to update the spreadsheet")
+async def updatespreadsheet(ctx)-> None:
+    my_file = Path("Results.csv")
+    if my_file.is_file():
+        data = separateFile()
+        updateStats(data)
+
 
 def GetPlayerFromDiscord(name: str) -> str:
     match name:
+        case "rainbowhead":
+            return "I"
         case "slane3470":
-            return 9
+            return "I"
         case ".celari":
-            return 14
+            return "N"
         case "dadude":
-            return 19
+            return "S"
         case "draconic_lord":
-            return 24
+            return "X"
         case "thereligionofpeanut":
-            return 29
+            return "AC"
         case "orourkustortoise":
-            return 34
+            return "AH"
         case "toomai1970":
-            return 39
+            return "AM"
         case "lazyvult":
-            return 44 
+            return "AR"
         case "antinium1312.":
-            return 49
+            return "AW"
         case "brotatornator666":
-            return 54
+            return "BB"
         case "ianoid":
-            return 59
+            return "BG"
         case "roobinski":
-            return 64
+            return "BL"
         case "bossors":
-            return 69
+            return "BQ"
         case "tsarplatinum":
-            return 74
+            return "BV"
         case "ordainedtick266":
-            return 79
+            return "CA"
         case "hamsternaut":
-            return 84
+            return "CF"
         case ".defize":
-            return 89
+            return "CK"
         case "._._neon_._.":
-            return 94
+            return "CP"
         case "vandyss":
-            return 99
+            return "CU"
         case "brob5046":
-            return 104
+            return "CZ"
         case "benign_skies":
-            return 109
+            return "DE"
         case "cgotnr":
-            return 114
+            return "DJ"
         case "seventyseven_77":
-            return 119
+            return "DO"
         case "trees17":
-            return 124
+            return "DT"
         case "jetotavio":
-            return 129
+            return "DY"
         case "livburrowss":
-            return 134
+            return "ED"
         case "sincerenumber82":
-            return 139
+            return "EI"
         case "withasideofsalt":
-            return 144
+            return "EN"
         case "thorijus":
-            return 149
+            return "ES"
         case _: #Error if not found player
-            return 0
+            return "ERROR"
         
-def FindPlayer(player: str) -> int:
+def FindPlayer(player: str) -> chr:
     match player:
-        case "Total":
-            return 4
         case "Oliver":
-            return 9
+            return "I"
         case "Sophie":
-            return 14
+            return "N"
         case "Ethan":
-            return 19
+            return "S"
         case "Richard":
-            return 24
+            return "X"
         case "Dan":
-            return 29
+            return "AC"
         case "Callum":
-            return 34
+            return "AH"
         case "Ryan":
-            return 39
+            return "AM"
         case "Stuart":
-            return 44 
+            return "AR" 
         case "Ant":
-            return 49
+            return "AW"
         case "Ronnie":
-            return 54
+            return "BB"
         case "Ian":
-            return 59
+            return "BG"
         case "Reuben":
-            return 64
+            return "BL"
         case "Findlay":
-            return 69
+            return "BQ"
         case "Daniel":
-            return 74
+            return "BV"
         case "Emily":
-            return 79
+            return "CA"
         case "Laurence":
-            return 84
+            return "CF"
         case "BenN":
-            return 89
+            return "CK"
         case "BenS":
-            return 94
+            return "CP"
         case "Andy":
-            return 99
+            return "CU"
         case "Ben3":
-            return 104
+            return "CZ"
         case "Carrick":
-            return 109
+            return "DE"
         case "Connor":
-            return 114
+            return "DJ"
         case "Drystan":
-            return 119
+            return "DO"
         case "Heather":
-            return 124
+            return "DT"
         case "Etienne":
-            return 129
+            return "DY"
         case "Liv":
-            return 134
+            return "ED"
         case "Rory":
-            return 139
+            return "EI"
         case "Scott":
-            return 144
+            return "EN"
         case "TJ":
-            return 149
+            return "ES"
         case _: #Error if not found player
-            return 0
+            return "ERROR"
         
 def FindRole(Role: str) -> int:
     match Role:
@@ -459,63 +476,70 @@ def FindRole(Role: str) -> int:
         
 def separateFile() -> array:
     with open('results.csv', newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-        Data = array('w')
+        reader = csv.reader(csvfile, delimiter=',')
+        Data = []
         for row in reader:
             Data.append(row)
         return Data
 
 def replacePlayerArray(Player: array) ->array:
-    FixedPlayer = array('L')
+    FixedPlayer = []
     for entry in Player:
         FixedPlayer.append(FindPlayer(entry))
     return FixedPlayer
 
 def replaceRoleArray(Role: array) ->array:
-    FixedRole = array('L')
+    FixedRole = []
     for entry in Role:
         FixedRole.append(FindRole(entry))
     return FixedRole
 
 def updateGoodStat(searchcolumn: int, searchrow: int, good_win: bool) -> None:
     if(not(good_win)): #since good has not won increment lost instead of win
-        searchcolumn += 1
-    searchedcell = sheet.cell(row = searchrow, column= searchcolumn)
-    searchedcell.value = searchedcell.value + 1
+        searchcolumn=chr(ord(searchcolumn)+1)
+    cell = str(searchcolumn) + str(searchrow)
+    print(cell)
+    value = sheet[cell].value
+    value += 1
+    sheet[cell] = value
+    workbook.save()
+    workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
+    
 
 def updateEvilStat(searchcolumn: int, searchrow: int, good_win: bool) -> None:
     if(good_win): #since good has won evil has not and thus must increment lost instead
-        searchcolumn += 1
-    searchedcell = sheet.cell(row = searchrow, column= searchcolumn)
-    searchedcell.value = searchedcell.value + 1
+        searchcolumn=chr(ord(searchcolumn)+1)
+    cell = str(searchcolumn) + str(searchrow)
+    print(cell)
+    value = sheet[cell].value
+    value += 1
+    sheet[cell] = value
+    workbook.save()
+    workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
 
 def updateStats(Data: array) -> None:
     i = 0
-    Player = array('w')
-    Role = array('w')
+    Player = []
+    Role = []
     for entry in Data:
         if(i == 0):
             good_win = entry
         elif(i % 2 == 0):
-            Player.append()
+            Role.append(str(entry))
         else:
-            Role.append()
+            Player.append(str(entry))
+        print(entry)
         i += 1
     i = 0
-    searchcolumn = replacePlayerArray
-    searchrow = replaceRoleArray
+    searchcolumn = replacePlayerArray(Player)
+    searchrow = replaceRoleArray(Role)
     for entry in searchrow:
         if(searchrow[i] >= 106):
             updateEvilStat(searchcolumn[i],searchrow[i],good_win)
         else:
             updateGoodStat(searchcolumn[i],searchrow[i],good_win)
         i += 1
+    Total = sheet['H5'].value
+    print(Total)
 
-def getPlayerStats(Player: str, Role: str):
-    searchcolumn = FindPlayer(Player)
-    searchrow = FindRole(Role)
-    searchedcell = sheet.cell(row = searchrow, column= searchcolumn)
-
-def saveAndClose() -> None:
-    workbook.save('BotC-Stats.xlsx')
-    
+bot.run('MTMwMzcxOTAwOTc5NTA0NzUyNg.Go9fCh.HTWyggF4jheVsZLmvOFhkdPW7TAuzI1p-jfmCI')
