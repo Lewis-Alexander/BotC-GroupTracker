@@ -92,7 +92,6 @@ async def playeraverage(interaction: discord.Interaction, player: str):
 @app_commands.describe(role = 'Role you would like to check, (Townsfolk for Townsfolk total and Total Good for all good)')
 async def roletotalstats(interaction: discord.Interaction, role: str):
     row = FindRole(role.lower())
-    print(row)
     if(row == 0):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True) 
     elif(row == 102 or row == 156 or row == 157):
@@ -520,43 +519,43 @@ def FindRole(Role: str) -> int:
         case "al-hadikhia":
             return 134
         case "fang gu":
-            return 134
-        case "imp":
-            return 134
-        case "kazali":
-            return 134
-        case "legion":
-            return 134
-        case "leviathan":
-            return 134
-        case "lil' monsta":
-            return 134
-        case "lleech":
-            return 134
-        case "lord of typhon":
-            return 134
-        case "no dashii":
-            return 134
-        case "ojo":
-            return 134
-        case "po":
-            return 134
-        case "pukka":
-            return 134
-        case "riot":
-            return 134
-        case "shabaloth":
-            return 134
-        case "vigormortis":
-            return 134
-        case "vortox":
-            return 134
-        case "yaggababble":
-            return 134
-        case "zombuul":
-            return 134
-        case "demon":
             return 135
+        case "imp":
+            return 136
+        case "kazali":
+            return 137
+        case "legion":
+            return 138
+        case "leviathan":
+            return 139
+        case "lil' monsta":
+            return 140
+        case "lleech":
+            return 141
+        case "lord of typhon":
+            return 142
+        case "no dashii":
+            return 143
+        case "ojo":
+            return 144
+        case "po":
+            return 145
+        case "pukka":
+            return 146
+        case "riot":
+            return 147
+        case "shabaloth":
+            return 148
+        case "vigormortis":
+            return 149
+        case "vortox":
+            return 150
+        case "yaggababble":
+            return 151
+        case "zombuul":
+            return 152
+        case "demon":
+            return 153
         #Totals
         case "total good":
             return 102
@@ -634,6 +633,5 @@ def updateStats(Data: array) -> None:
             updateGoodStat(column[i],row[i],good_win)
         i += 1
     Total = sheet['H5'].value
-    print(Total)
 
 bot.run('MTMwMzcxOTAwOTc5NTA0NzUyNg.GWHdIn.4qN6deiWx2QhX6rsC-YBQlPTeAjOKcMK90dbqM')
