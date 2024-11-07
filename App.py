@@ -33,33 +33,44 @@ async def sync(ctx: commands.Context) -> None:
 
 @bot.tree.command(name="personalaverage", description="Check your average winrates for sides")
 async def personalaverage(interaction: discord.Interaction):
-    searchcolumn = GetPlayerFromDiscord(interaction.user.name)
-    searchcolumn=chr(ord(searchcolumn)+2)
-    cell = str(searchcolumn)+str(102)
+    column = GetPlayerFromDiscord(interaction.user.name)
+    column=chr(ord(column)+2)
+    cell = str(column)+str(102)
     TotalGood = sheet[cell].value
-    cell = str(searchcolumn)+str(156)
+    cell = str(column)+str(156)
     TotalEvil = sheet[cell].value
-    cell = str(searchcolumn)+str(157)
+    cell = str(column)+str(157)
     Total = sheet[cell].value
     await interaction.response.send_message(f"Your average winrate is {str(Total)} consisting of {str(TotalGood)} whilst good and {str(TotalEvil)} whilst evil!", ephemeral=True)
 
 
 
-@bot.tree.command(name="personalrolestats", description="Check any players stats for a particular role")
+@bot.tree.command(name="personalrolestats", description="Check any your stats for a particular role")
 @app_commands.describe(role = 'Role you would like to check (Townsfolk for Townsfolk total and Total Good for all good)')
 async def roleaverage(interaction: discord.Interaction, role: str):
-    searchcolumn = GetPlayerFromDiscord(interaction.user.name)
-    searchcolumn=chr(ord(searchcolumn)-1)
+    column = GetPlayerFromDiscord(interaction.user.name)
+    column=chr(ord(column)-1)
     row = FindRole(role.lower())
     if(row == 0):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True)
+    elif(row == 102 or row == 156 or row == 157):
+        cell1 = 'C'+str(row)
+        cell2 = 'F'+str(row)
+        await interaction.response.send_message(f'your {sheet[cell1].value} is {sheet[cell2].value}')
+    elif(row == 153 or row == 130 or row == 99 or row == 73):
+        data = []
+        for i in range(4):       
+            cell = str(column)+str(row)
+            data.append(sheet[cell].value)
+            column=chr(ord(column)+1)
+        await interaction.response.send_message(f'you have been the {role} {data[0]} times, of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.', ephemeral=True)
     else:
         data = []
         for i in range(4):       
-            cell = str(searchcolumn)+str(row)
+            cell = str(column)+str(row)
             data.append(sheet[cell].value)
-            searchcolumn=chr(ord(searchcolumn)+1)
-        await interaction.response.send_message(f'you have played the {role} {data[0]} times of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.', ephemeral=True)
+            column=chr(ord(column)+1)
+        await interaction.response.send_message(f'you have played the {role} {data[0]} times, of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.', ephemeral=True)
 
 @bot.tree.command(name="playeraverage", description="Check any players average winrates")
 @app_commands.describe(player = 'Player you would like to see the averages for')
@@ -81,15 +92,28 @@ async def playeraverage(interaction: discord.Interaction, player: str):
 @app_commands.describe(role = 'Role you would like to check, (Townsfolk for Townsfolk total and Total Good for all good)')
 async def roletotalstats(interaction: discord.Interaction, role: str):
     row = FindRole(role.lower())
+    print(row)
     if(row == 0):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True) 
-    else: 
-        searchcolumn = 'C'
+    elif(row == 102 or row == 156 or row == 157):
+        cell1 = 'C'+str(row)
+        cell2 = 'F'+str(row)
+        await interaction.response.send_message(f'the {sheet[cell1].value} is {sheet[cell2].value}')
+    elif(row == 153 or row == 130 or row == 99 or row == 73):
+        column = 'C'
         data = []
         for i in range(4):       
-                cell = str(searchcolumn)+str(row)
+            cell = str(column)+str(row)
+            data.append(sheet[cell].value)
+            column=chr(ord(column)+1)
+        await interaction.response.send_message(f'{role}(s) have been played {data[0]} times, of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)
+    else: 
+        column = 'C'
+        data = []
+        for i in range(4):       
+                cell = str(column)+str(row)
                 data.append(sheet[cell].value)
-                searchcolumn=chr(ord(searchcolumn)+1)
+                column=chr(ord(column)+1)
         await interaction.response.send_message(f'The {role} has been played {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)
 
 @bot.tree.command(name='playerrolestats', description="Check any players stats for a particular role")
@@ -567,10 +591,10 @@ def replaceRoleArray(Role: array) ->array:
         FixedRole.append(FindRole(role))
     return FixedRole
 
-def updateGoodStat(searchcolumn: int, searchrow: int, good_win: bool) -> None:
+def updateGoodStat(column: int, row: int, good_win: bool) -> None:
     if(not(good_win)): #since good has not won increment lost instead of win
-        searchcolumn=chr(ord(searchcolumn)+1)
-    cell = str(searchcolumn) + str(searchrow)
+        column=chr(ord(column)+1)
+    cell = str(column) + str(row)
     value = sheet[cell].value
     value += 1
     sheet[cell].value = value
@@ -578,10 +602,10 @@ def updateGoodStat(searchcolumn: int, searchrow: int, good_win: bool) -> None:
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
     
 
-def updateEvilStat(searchcolumn: int, searchrow: int, good_win: bool) -> None:
+def updateEvilStat(column: int, row: int, good_win: bool) -> None:
     if(good_win): #since good has won evil has not and thus must increment lost instead
-        searchcolumn=chr(ord(searchcolumn)+1)
-    cell = str(searchcolumn) + str(searchrow)
+        column=chr(ord(column)+1)
+    cell = str(column) + str(row)
     value = sheet[cell].value
     value += 1
     sheet[cell].value = value
@@ -601,13 +625,13 @@ def updateStats(Data: array) -> None:
             Player.append(entry)
         i += 1
     i = 0
-    searchcolumn = replacePlayerArray(Player)
-    searchrow = replaceRoleArray(Role)
-    for entry in searchrow:
-        if(searchrow[i] >= 106):
-            updateEvilStat(searchcolumn[i],searchrow[i],good_win)
+    column = replacePlayerArray(Player)
+    row = replaceRoleArray(Role)
+    for entry in row:
+        if(row[i] >= 106):
+            updateEvilStat(column[i],row[i],good_win)
         else:
-            updateGoodStat(searchcolumn[i],searchrow[i],good_win)
+            updateGoodStat(column[i],row[i],good_win)
         i += 1
     Total = sheet['H5'].value
     print(Total)
