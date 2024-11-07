@@ -5,7 +5,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from pathlib import Path
-import enum
 
 #------bot stuff--------
 bot = commands.Bot(command_prefix='!', intents = discord.Intents.all())
@@ -34,7 +33,8 @@ async def sync(ctx: commands.Context) -> None:
 @bot.tree.command(name="personalaverage", description="Check your average winrates for sides")
 async def personalaverage(interaction: discord.Interaction):
     column = GetPlayerFromDiscord(interaction.user.name)
-    column=chr(ord(column)+2)
+    column = incrementcol(column)
+    column = incrementcol(column)
     cell = str(column)+str(102)
     TotalGood = sheet[cell].value
     cell = str(column)+str(156)
@@ -49,7 +49,7 @@ async def personalaverage(interaction: discord.Interaction):
 @app_commands.describe(role = 'Role you would like to check (Townsfolk for Townsfolk total and Total Good for all good)')
 async def roleaverage(interaction: discord.Interaction, role: str):
     column = GetPlayerFromDiscord(interaction.user.name)
-    column=chr(ord(column)-1)
+    column = decrementcol(column)
     row = FindRole(role.lower())
     if(row == 0):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True)
@@ -62,14 +62,14 @@ async def roleaverage(interaction: discord.Interaction, role: str):
         for i in range(4):       
             cell = str(column)+str(row)
             data.append(sheet[cell].value)
-            column=chr(ord(column)+1)
+            column = incrementcol(column)
         await interaction.response.send_message(f'you have been the {role} {data[0]} times, of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.', ephemeral=True)
     else:
         data = []
         for i in range(4):       
             cell = str(column)+str(row)
             data.append(sheet[cell].value)
-            column=chr(ord(column)+1)
+            column = incrementcol(column)
         await interaction.response.send_message(f'you have played the {role} {data[0]} times, of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.', ephemeral=True)
 
 @bot.tree.command(name="playeraverage", description="Check any players average winrates")
@@ -79,7 +79,8 @@ async def playeraverage(interaction: discord.Interaction, player: str):
     if(column == "ERROR"):
         await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
     else:
-        column=chr(ord(column)+2)
+        column = incrementcol(column)
+        column = incrementcol(column)
         data = []
         rows = [102,156,157]
         for i in range(3):       
@@ -104,7 +105,7 @@ async def roletotalstats(interaction: discord.Interaction, role: str):
         for i in range(4):       
             cell = str(column)+str(row)
             data.append(sheet[cell].value)
-            column=chr(ord(column)+1)
+            column = incrementcol(column)
         await interaction.response.send_message(f'{role}(s) have been played {data[0]} times, of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)
     else: 
         column = 'C'
@@ -112,7 +113,7 @@ async def roletotalstats(interaction: discord.Interaction, role: str):
         for i in range(4):       
                 cell = str(column)+str(row)
                 data.append(sheet[cell].value)
-                column=chr(ord(column)+1)
+                column = incrementcol(column)
         await interaction.response.send_message(f'The {role} has been played {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)
 
 @bot.tree.command(name='playerrolestats', description="Check any players stats for a particular role")
@@ -130,7 +131,7 @@ async def playerrolestats(interaction: discord.Interaction, role: str, player: s
         for i in range(4):       
                 cell = str(column)+str(row)
                 data.append(sheet[cell].value)
-                column=chr(ord(column)+1)
+                column = incrementcol(column)
         await interaction.response.send_message(f'{player} has played {role} {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)   
     
         
@@ -141,14 +142,127 @@ async def uploaddatabase(interaction: discord.Interaction):
 
 @commands.is_owner()  # Prevent other people from using the command
 @bot.tree.command(name="updatespreadsheet", description="if program has a csv file it uses it to update the spreadsheet")
-async def updatespreadsheet(ctx)-> None:
+async def updatespreadsheet(interaction: discord.Interaction)-> None:
     my_file = Path("Results.csv")
     if my_file.is_file():
         data = separateFile()
         updateStats(data)
 
+@commands.is_owner()
+@bot.tree.command(name="updateroles", description="auto update roles from database")
+async def updateroles(interaction : discord.Interaction):
+    server = bot.get_guild(1192193425739612281)
+    role0 = server.get_role(1294069983151919134)
+    role20 = server.get_role(1294281073043177535)
+    role40 = server.get_role(1294068836764614788)
+    role60 = server.get_role(1294069566409801760)
+    role80 = server.get_role(1294068801448574996)
+    role100 = server.get_role(1294068667801276426)
+    notfound = True
+    column = 'I'
+    players = []
+    while(notfound):
+        cell = column + '1'
+        cellval = sheet[cell].value
+        if(cellval == 'None'):
+            notfound = False
+        players.append(sheet[cell].value)
+        for i in range (5):
+            column = incrementcol(column)
+    i = 0
+    for member in server.members:
+        if(GetPlayerFromDiscord(member.name) == FindPlayer(players[i])):
+            column = 'F'
+            for x in range(i*5):
+                column = incrementcol(column)
+            cell = str(column) + '158'
+            if(sheet[cell].value < 20):
+                await member.add_roles(role0)
+            elif(sheet[cell].value < 40):
+                await member.add_roles(role20)
+                await member.remove_roles(role0)
+            elif(sheet[cell].value < 60):
+                await member.add_roles(role40)
+                await member.remove_roles(role20)
+            elif(sheet[cell].value < 80):
+                await member.add_roles(role60)
+                await member.remove_roles(role40)
+            elif(sheet[cell].value < 100):
+                await member.add_roles(role80)
+                await member.remove_roles(role60)
+            else:
+                await member.add_roles(role100)
+                await member.remove_roles(role80)
+
+
+
 
 def GetPlayerFromDiscord(name: str) -> str:
+    match name:
+        case "rainbowhead":
+            return "I"
+        case "slane3470":
+            return "I"
+        case ".celari":
+            return "N"
+        case "dadude":
+            return "S"
+        case "draconic_lord":
+            return "X"
+        case "thereligionofpeanut":
+            return "AC"
+        case "orourkustortoise":
+            return "AH"
+        case "toomai1970":
+            return "AM"
+        case "lazyvult":
+            return "AR"
+        case "antinium1312.":
+            return "AW"
+        case "brotatornator666":
+            return "BB"
+        case "ianoid":
+            return "BG"
+        case "roobinski":
+            return "BL"
+        case "bossors":
+            return "BQ"
+        case "tsarplatinum":
+            return "BV"
+        case "ordainedtick266":
+            return "CA"
+        case "hamsternaut":
+            return "CF"
+        case ".defize":
+            return "CK"
+        case "._._neon_._.":
+            return "CP"
+        case "vandyss":
+            return "CU"
+        case "brob5046":
+            return "CZ"
+        case "benign_skies":
+            return "DE"
+        case "cgotnr":
+            return "DJ"
+        case "seventyseven_77":
+            return "DO"
+        case "trees17":
+            return "DT"
+        case "jetotavio":
+            return "DY"
+        case "livburrowss":
+            return "ED"
+        case "sincerenumber82":
+            return "EI"
+        case "withasideofsalt":
+            return "EN"
+        case "thorijus":
+            return "ES"
+        case _: #Error if not found player
+            return "ERROR"
+
+def GetDiscordFromPlayer(name: str) -> str:
     match name:
         case "rainbowhead":
             return "I"
@@ -592,7 +706,7 @@ def replaceRoleArray(Role: array) ->array:
 
 def updateGoodStat(column: int, row: int, good_win: bool) -> None:
     if(not(good_win)): #since good has not won increment lost instead of win
-        column=chr(ord(column)+1)
+        column = incrementcol(column)
     cell = str(column) + str(row)
     value = sheet[cell].value
     value += 1
@@ -603,7 +717,7 @@ def updateGoodStat(column: int, row: int, good_win: bool) -> None:
 
 def updateEvilStat(column: int, row: int, good_win: bool) -> None:
     if(good_win): #since good has won evil has not and thus must increment lost instead
-        column=chr(ord(column)+1)
+        column = incrementcol(column)
     cell = str(column) + str(row)
     value = sheet[cell].value
     value += 1
@@ -633,5 +747,44 @@ def updateStats(Data: array) -> None:
             updateGoodStat(column[i],row[i],good_win)
         i += 1
     Total = sheet['H5'].value
+
+def incrementcol(string: str):
+    lst = list(string) 
+    result = []
+    while lst:
+        carry, next_ = increment_char(lst.pop())
+        result.append(next_)
+        if not carry:
+            break
+        if not lst:
+            result.append('A')   
+    result += lst[::-1]
+    return ''.join(result[::-1])
+
+def increment_char(char: chr):
+        if char in ('Z'):
+            return 1, 'A'
+        else:
+            return 0, chr(ord(char) + 1)
+
+def decrementcol(string: str):
+    lst = list(string)
+    result = []
+    while lst:
+        carry, next_ = decrement_char(lst.pop())
+        result.append(next_)
+        if not carry:
+            break
+        if not lst:
+            result.pop()  #since when AA is decremented it goes to Z so should pop i think
+    result += lst[::-1]
+    return ''.join(result[::-1])
+
+def decrement_char(char: chr):
+        if char in ('A'):
+            return 0, 'Z'
+        else:
+            return 1, chr(ord(char) - 1)
+
 
 bot.run('MTMwMzcxOTAwOTc5NTA0NzUyNg.GWHdIn.4qN6deiWx2QhX6rsC-YBQlPTeAjOKcMK90dbqM')
