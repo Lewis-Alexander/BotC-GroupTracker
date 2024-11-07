@@ -5,16 +5,13 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from pathlib import Path
+import enum
 
 #------bot stuff--------
 bot = commands.Bot(command_prefix='!', intents = discord.Intents.all())
 workbook = xw.Book('BotC-Stats.xlsx')
 sheet = workbook.sheets['Sheet1']
 
-
-class MyCog(commands.Cog):
-  def __init__(self, bot: commands.Bot) -> None:
-    self.bot = bot
 
 @bot.event
 async def on_ready():
@@ -34,7 +31,7 @@ async def sync(ctx: commands.Context) -> None:
         print(e)
     
 
-@bot.tree.command(name="personalaverage")
+@bot.tree.command(name="personalaverage", description="Check your average winrates for sides")
 async def personalaverage(interaction: discord.Interaction):
     searchcolumn = GetPlayerFromDiscord(interaction.user.name)
     searchcolumn=chr(ord(searchcolumn)+2)
@@ -46,6 +43,78 @@ async def personalaverage(interaction: discord.Interaction):
     Total = sheet[cell].value
     await interaction.response.send_message(f"Your average winrate is {str(Total)} consisting of {str(TotalGood)} whilst good and {str(TotalEvil)} whilst evil!", ephemeral=True)
 
+
+
+@bot.tree.command(name="personalrolestats", description="Check any players stats for a particular role")
+@app_commands.describe(role = 'Role you would like to check (Townsfolk for Townsfolk total and Total Good for all good)')
+async def roleaverage(interaction: discord.Interaction, role: str):
+    searchcolumn = GetPlayerFromDiscord(interaction.user.name)
+    searchcolumn=chr(ord(searchcolumn)-1)
+    row = FindRole(role.lower())
+    if(row == 0):
+        await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True)
+    else:
+        data = []
+        for i in range(4):       
+            cell = str(searchcolumn)+str(row)
+            data.append(sheet[cell].value)
+            searchcolumn=chr(ord(searchcolumn)+1)
+        await interaction.response.send_message(f'you have played the {role} {data[0]} times of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.', ephemeral=True)
+
+@bot.tree.command(name="playeraverage", description="Check any players average winrates")
+@app_commands.describe(player = 'Player you would like to see the averages for')
+async def playeraverage(interaction: discord.Interaction, player: str):
+    column = FindPlayer(player.lower())
+    if(column == "ERROR"):
+        await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
+    else:
+        column=chr(ord(column)+2)
+        data = []
+        rows = [102,156,157]
+        for i in range(3):       
+            cell = str(column)+str(rows[i])
+            data.append(sheet[cell].value)
+        await interaction.response.send_message(f'{player}s average winrates are as follows: Good-{data[0]} Evil-{data[1]} Total-{data[2]}')
+
+
+@bot.tree.command(name="roletotalstats", description="Check the stats for a particular role")
+@app_commands.describe(role = 'Role you would like to check, (Townsfolk for Townsfolk total and Total Good for all good)')
+async def roletotalstats(interaction: discord.Interaction, role: str):
+    row = FindRole(role.lower())
+    if(row == 0):
+        await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True) 
+    else: 
+        searchcolumn = 'C'
+        data = []
+        for i in range(4):       
+                cell = str(searchcolumn)+str(row)
+                data.append(sheet[cell].value)
+                searchcolumn=chr(ord(searchcolumn)+1)
+        await interaction.response.send_message(f'The {role} has been played {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)
+
+@bot.tree.command(name='playerrolestats', description="Check any players stats for a particular role")
+@app_commands.describe(role = 'Role you would like to check, (Townsfolk for Townsfolk total and Total Good for all good)')
+@app_commands.describe(player = 'Player you would like to check (same name as on spreadsheet)')
+async def playerrolestats(interaction: discord.Interaction, role: str, player: str):
+    row = FindRole(role.lower())
+    column = FindPlayer(player.lower())
+    if(row == 0):
+        await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True)
+    elif(column == "ERROR"):
+        await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
+    else:
+        data = []
+        for i in range(4):       
+                cell = str(column)+str(row)
+                data.append(sheet[cell].value)
+                column=chr(ord(column)+1)
+        await interaction.response.send_message(f'{player} has played {role} {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)   
+    
+        
+
+@bot.tree.command(name="uploaddatabase", description="Uploads the current entire database to be checked")
+async def uploaddatabase(interaction: discord.Interaction):
+    await interaction.response.send_message(file=discord.File(r'BotC-Stats.xlsx'))
 
 @commands.is_owner()  # Prevent other people from using the command
 @bot.tree.command(name="updatespreadsheet", description="if program has a csv file it uses it to update the spreadsheet")
@@ -123,63 +192,63 @@ def GetPlayerFromDiscord(name: str) -> str:
         
 def FindPlayer(player: str) -> chr:
     match player:
-        case "Oliver":
+        case "oliver":
             return "I"
-        case "Sophie":
+        case "sophie":
             return "N"
-        case "Ethan":
+        case "ethan":
             return "S"
-        case "Richard":
+        case "richard":
             return "X"
-        case "Dan":
+        case "dan":
             return "AC"
-        case "Callum":
+        case "callum":
             return "AH"
-        case "Ryan":
+        case "ryan":
             return "AM"
-        case "Stuart":
+        case "stuart":
             return "AR" 
-        case "Ant":
+        case "ant":
             return "AW"
-        case "Ronnie":
+        case "ronnie":
             return "BB"
-        case "Ian":
+        case "ian":
             return "BG"
-        case "Reuben":
+        case "reuben":
             return "BL"
-        case "Findlay":
+        case "findlay":
             return "BQ"
-        case "Daniel":
+        case "daniel":
             return "BV"
-        case "Emily":
+        case "emily":
             return "CA"
-        case "Laurence":
+        case "laurence":
             return "CF"
-        case "BenN":
+        case "benn":
             return "CK"
-        case "BenS":
+        case "bens":
             return "CP"
-        case "Andy":
+        case "andy":
             return "CU"
-        case "Ben3":
+        case "ben3":
             return "CZ"
-        case "Carrick":
+        case "carrick":
             return "DE"
-        case "Connor":
+        case "connor":
             return "DJ"
-        case "Drystan":
+        case "drystan":
             return "DO"
-        case "Heather":
+        case "heather":
             return "DT"
-        case "Etienne":
+        case "etienne":
             return "DY"
-        case "Liv":
+        case "liv":
             return "ED"
-        case "Rory":
+        case "rory":
             return "EI"
-        case "Scott":
+        case "scott":
             return "EN"
-        case "TJ":
+        case "tj":
             return "ES"
         case _: #Error if not found player
             return "ERROR"
@@ -187,289 +256,289 @@ def FindPlayer(player: str) -> chr:
 def FindRole(Role: str) -> int:
     match Role:
         #Townsfolk
-        case "Acrobat":
+        case "acrobat":
             return 5
-        case "Alchemist":
+        case "alchemist":
             return 6
-        case "Alsaahir":
+        case "alsaahir":
             return 7
-        case "Amnesiac":
+        case "amnesiac":
             return 8
-        case "Artist":
+        case "artist":
             return 9
-        case "Atheist":
+        case "atheist":
             return 10
-        case "Ballonist":
+        case "ballonist":
             return 11
-        case "Banshee":
+        case "banshee":
             return 12
-        case "Bounty Hunter":
+        case "bounty hunter":
             return 13
-        case "Cannibal":
+        case "cannibal":
             return 14
-        case "Chambermaid":
+        case "chambermaid":
             return 15
-        case "Chef":
+        case "chef":
             return 16
-        case "Choirboy":
+        case "choirboy":
             return 17
-        case "Clockmaker":
+        case "clockmaker":
             return 18
-        case "Courtier":
+        case "courtier":
             return 19
-        case "Cult Leader":
+        case "cult Leader":
             return 20
-        case "Dreamer":
+        case "dreamer":
             return 21
-        case "Empath":
+        case "empath":
             return 22
-        case "Engineer":
+        case "engineer":
             return 23
-        case "Exorcist":
+        case "exorcist":
             return 24
-        case "Farmer":
+        case "farmer":
             return 25
-        case "Fisherman":
+        case "fisherman":
             return 26
-        case "Flowergirl":
+        case "flowergirl":
             return 27
-        case "Fool":
+        case "fool":
             return 28
-        case "Fortune Teller":
+        case "fortune teller":
             return 29
-        case "Gambler":
+        case "gambler":
             return 30
-        case "General":
+        case "general":
             return 31
-        case "Gossip":
+        case "gossip":
             return 32
-        case "Grandmother":
+        case "grandmother":
             return 33
-        case "High Priestess":
+        case "high priestess":
             return 34
-        case "Huntsman":
+        case "huntsman":
             return 35
-        case "Innkeeper":
+        case "innkeeper":
             return 36
-        case "Investigator":
+        case "investigator":
             return 37
-        case "Juggler":
+        case "juggler":
             return 38
-        case "King":
+        case "king":
             return 39
-        case "Knight":
+        case "knight":
             return 40
-        case "Librarian":
+        case "librarian":
             return 41
-        case "Lycanthrope":
+        case "lycanthrope":
             return 42
-        case "Magician":
+        case "magician":
             return 43
-        case "Mathmetician":
+        case "mathmetician":
             return 44
-        case "Mayor":
+        case "mayor":
             return 45
-        case "Minstrel":
+        case "minstrel":
             return 46
-        case "Monk":
+        case "monk":
             return 47
-        case "Nightwatchman":
+        case "nightwatchman":
             return 48
-        case "Noble":
+        case "noble":
             return 49
-        case "Oracle":
+        case "oracle":
             return 50
-        case "Pacifist":
+        case "pacifist":
             return 51
-        case "Philosopher":
+        case "philosopher":
             return 52
-        case "Pixie":
+        case "pixie":
             return 53
-        case "Poppy Grower":
+        case "poppy grower":
             return 54
-        case "Preacher":
+        case "preacher":
             return 55
-        case "Professor":
+        case "professor":
             return 56
-        case "Ravenkeeper":
+        case "ravenkeeper":
             return 57
-        case "Sage":
+        case "sage":
             return 58
-        case "Sailor":
+        case "sailor":
             return 59
-        case "Savant":
+        case "savant":
             return 60
-        case "Seamstress":
+        case "seamstress":
             return 61
-        case "Shugenja":
+        case "shugenja":
             return 62
-        case "Slayer":
+        case "slayer":
             return 63
-        case "Snake Charmer":
+        case "snake Charmer":
             return 64
-        case "Soldier":
+        case "soldier":
             return 65
-        case "Steward":
+        case "steward":
             return 66
-        case "Tea Lady":
+        case "tea lady":
             return 67
-        case "Town Crier":
+        case "town crier":
             return 68
-        case "Undertaker":
+        case "undertaker":
             return 69
-        case "Village Idiot":
+        case "village idiot":
             return 70
-        case "Virgin":
+        case "virgin":
             return 71
-        case "Washerwoman":
+        case "washerwoman":
             return 72
-        case "Townsfolk":
+        case "townsfolk":
             return 73
         #Outsiders
-        case "Barber":
+        case "barber":
             return 77
-        case "Butler":
+        case "butler":
             return 78
-        case "Damsel":
+        case "damsel":
             return 79
-        case "Drunk":
+        case "drunk":
             return 80
-        case "Golem":
+        case "golem":
             return 81
-        case "Goon":
+        case "goon":
             return 82
-        case "Hatter":
+        case "hatter":
             return 83
-        case "Heretic":
+        case "heretic":
             return 84
-        case "Klutz":
+        case "klutz":
             return 85
-        case "Lunatic":
+        case "lunatic":
             return 86
-        case "Moonchild":
+        case "moonchild":
             return 87
-        case "Mutant":
+        case "mutant":
             return 88
-        case "Ogre":
+        case "ogre":
             return 89
-        case "Plague Doctor":
+        case "plague doctor":
             return 90
-        case "Politician":
+        case "politician":
             return 91
-        case "Puzzlemaster":
+        case "puzzlemaster":
             return 92
-        case "Recluse":
+        case "recluse":
             return 93
-        case "Saint":
+        case "saint":
             return 94
-        case "Snitch":
+        case "snitch":
             return 95
-        case "Sweetheart":
+        case "sweetheart":
             return 96
-        case "Tinker":
+        case "tinker":
             return 97
-        case "Zealot":
+        case "zealot":
             return 98
-        case "Outsider":
+        case "outsider":
             return 99
         #Minions
-        case "Assassin":
+        case "assassin":
             return 106
-        case "Baron":
+        case "baron":
             return 107
-        case "Boffin":
+        case "boffin":
             return 108
-        case "Boomdandy":
+        case "boomdandy":
             return 109
-        case "Cerenovus":
+        case "cerenovus":
             return 110
-        case "Devil's Advocate":
+        case "devil's advocate":
             return 111
-        case "Evil Twin":
+        case "evil twin":
             return 112
-        case "Fearmonger":
+        case "fearmonger":
             return 113
-        case "Goblin":
+        case "goblin":
             return 114
-        case "Godfather":
+        case "godfather":
             return 115
-        case "Harpy":
+        case "harpy":
             return 116
-        case "Marionette":
+        case "marionette":
             return 117
-        case "Mastermind":
+        case "mastermind":
             return 118
-        case "Mezepheles":
+        case "mezepheles":
             return 119
-        case "Organ Grinder":
+        case "organ grinder":
             return 120
-        case "Pit-Hag":
+        case "pit-hag":
             return 121
-        case "Poisoner":
+        case "poisoner":
             return 122
-        case "Psychopath":
+        case "psychopath":
             return 123
-        case "Scarlet Woman":
+        case "scarlet woman":
             return 124
-        case "Spy":
+        case "spy":
             return 125
-        case "Summoner":
+        case "summoner":
             return 126
-        case "Vizier":
+        case "vizier":
             return 127
-        case "Widow":
+        case "widow":
             return 128
-        case "Witch":
+        case "witch":
             return 129
-        case "Minion":
+        case "minion":
             return 130
         #Demons
-        case "Al-Hadikhia":
+        case "al-hadikhia":
             return 134
-        case "Fang Gu":
+        case "fang gu":
             return 134
-        case "Imp":
+        case "imp":
             return 134
-        case "Kazali":
+        case "kazali":
             return 134
-        case "Legion":
+        case "legion":
             return 134
-        case "Leviathan":
+        case "leviathan":
             return 134
-        case "Lil'Monsta":
+        case "lil' monsta":
             return 134
-        case "Lleech":
+        case "lleech":
             return 134
-        case "Lord of Typhon":
+        case "lord of typhon":
             return 134
-        case "No Dashii":
+        case "no dashii":
             return 134
-        case "Ojo":
+        case "ojo":
             return 134
-        case "Po":
+        case "po":
             return 134
-        case "Pukka":
+        case "pukka":
             return 134
-        case "Riot":
+        case "riot":
             return 134
-        case "Shabaloth":
+        case "shabaloth":
             return 134
-        case "Vigormortis":
+        case "vigormortis":
             return 134
-        case "Vortox":
+        case "vortox":
             return 134
-        case "Yaggababble":
+        case "yaggababble":
             return 134
-        case "Zombuul":
+        case "zombuul":
             return 134
-        case "Demon":
+        case "demon":
             return 135
         #Totals
-        case "Total Good":
+        case "total good":
             return 102
-        case "Total Evil":
+        case "total evil":
             return 156
-        case "Total":
+        case "total":
             return 157
         #Error case if not found
         case _:
