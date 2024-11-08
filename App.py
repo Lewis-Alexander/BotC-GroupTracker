@@ -148,8 +148,7 @@ async def updatespreadsheet(interaction: discord.Interaction)-> None:
         data = separateFile()
         updateStats(data)
 
-@commands.is_owner()
-@bot.tree.command(name="updateroles", description="auto update roles from database")
+@bot.tree.command(name="updaterole", description="auto update roles from database")
 async def updateroles(interaction : discord.Interaction):
     server = bot.get_guild(1192193425739612281)
     role0 = server.get_role(1294069983151919134)
@@ -158,41 +157,37 @@ async def updateroles(interaction : discord.Interaction):
     role60 = server.get_role(1294069566409801760)
     role80 = server.get_role(1294068801448574996)
     role100 = server.get_role(1294068667801276426)
-    notfound = True
-    column = 'I'
-    players = []
-    while(notfound):
-        cell = column + '1'
-        cellval = sheet[cell].value
-        if(cellval == 'None'):
-            notfound = False
-        players.append(sheet[cell].value)
-        for i in range (5):
-            column = incrementcol(column)
-    i = 0
-    for member in server.members:
-        if(GetPlayerFromDiscord(member.name) == FindPlayer(players[i])):
-            column = 'F'
-            for x in range(i*5):
-                column = incrementcol(column)
-            cell = str(column) + '158'
-            if(sheet[cell].value < 20):
-                await member.add_roles(role0)
-            elif(sheet[cell].value < 40):
-                await member.add_roles(role20)
-                await member.remove_roles(role0)
-            elif(sheet[cell].value < 60):
-                await member.add_roles(role40)
-                await member.remove_roles(role20)
-            elif(sheet[cell].value < 80):
-                await member.add_roles(role60)
-                await member.remove_roles(role40)
-            elif(sheet[cell].value < 100):
-                await member.add_roles(role80)
-                await member.remove_roles(role60)
-            else:
-                await member.add_roles(role100)
-                await member.remove_roles(role80)
+    member = interaction.user
+    column = GetPlayerFromDiscord(member.name)
+    column = incrementcol(column)
+    column = incrementcol(column)
+    cell = column + '158'
+    cellval = sheet[cell].value
+    if(cellval < 20):
+        await member.add_roles(role0)
+        await interaction.response.send_message(f'You have been assigned the 0+ games role as you have not yet attended enough to increase', ephemeral=True)
+    elif(cellval < 40):
+        await member.add_roles(role20)
+        await member.remove_roles(role0)
+        await interaction.response.send_message(f'You have been assigned the 20+ games role as you have attended enough to increase', ephemeral=True)
+    elif(cellval < 60):
+        await member.add_roles(role40)
+        await member.remove_roles(role20)
+        await interaction.response.send_message(f'You have been assigned the 40+ games role as you have attended enough to increase', ephemeral=True)
+    elif(cellval < 80):
+        await member.add_roles(role60)
+        await member.remove_roles(role40)
+        await interaction.response.send_message(f'You have been assigned the 60+ games role as you have attended enough to increase', ephemeral=True)
+    elif(cellval < 100):
+        await member.add_roles(role80)
+        await member.remove_roles(role60)
+        await interaction.response.send_message(f'You have been assigned the 80+ games role as you have attended enough to increase', ephemeral=True)
+    else:
+        await member.add_roles(role100)
+        await member.remove_roles(role80)
+        await interaction.response.send_message(f'You have been assigned the 100+ games role as you have attended enough to increase', ephemeral=True)
+    
+        
 
 
 
@@ -262,70 +257,6 @@ def GetPlayerFromDiscord(name: str) -> str:
         case _: #Error if not found player
             return "ERROR"
 
-def GetDiscordFromPlayer(name: str) -> str:
-    match name:
-        case "rainbowhead":
-            return "I"
-        case "slane3470":
-            return "I"
-        case ".celari":
-            return "N"
-        case "dadude":
-            return "S"
-        case "draconic_lord":
-            return "X"
-        case "thereligionofpeanut":
-            return "AC"
-        case "orourkustortoise":
-            return "AH"
-        case "toomai1970":
-            return "AM"
-        case "lazyvult":
-            return "AR"
-        case "antinium1312.":
-            return "AW"
-        case "brotatornator666":
-            return "BB"
-        case "ianoid":
-            return "BG"
-        case "roobinski":
-            return "BL"
-        case "bossors":
-            return "BQ"
-        case "tsarplatinum":
-            return "BV"
-        case "ordainedtick266":
-            return "CA"
-        case "hamsternaut":
-            return "CF"
-        case ".defize":
-            return "CK"
-        case "._._neon_._.":
-            return "CP"
-        case "vandyss":
-            return "CU"
-        case "brob5046":
-            return "CZ"
-        case "benign_skies":
-            return "DE"
-        case "cgotnr":
-            return "DJ"
-        case "seventyseven_77":
-            return "DO"
-        case "trees17":
-            return "DT"
-        case "jetotavio":
-            return "DY"
-        case "livburrowss":
-            return "ED"
-        case "sincerenumber82":
-            return "EI"
-        case "withasideofsalt":
-            return "EN"
-        case "thorijus":
-            return "ES"
-        case _: #Error if not found player
-            return "ERROR"
         
 def FindPlayer(player: str) -> chr:
     match player:
