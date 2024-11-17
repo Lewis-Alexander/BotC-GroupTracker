@@ -71,7 +71,7 @@ async def playeraverage(interaction: discord.Interaction, player: str):
         column = incrementcol(column)
         column = incrementcol(column)
         data = []
-        rows = [102,156,157]
+        rows = [FindRole('total good'),FindRole('total evil'),FindRole('total')]
         for i in range(3):       
             cell = str(column)+str(rows[i])
             data.append(sheet[cell].value)
@@ -438,154 +438,162 @@ def FindRole(Role: str) -> int:
             return 71
         case "washerwoman":
             return 72
-        case "townsfolk":
+        case "homebrew townsfolk":
             return 73
+        case "townsfolk":
+            return 74
         #Outsiders
         case "barber":
-            return 77
-        case "butler":
             return 78
-        case "damsel":
+        case "butler":
             return 79
-        case "drunk":
+        case "damsel":
             return 80
-        case "golem":
+        case "drunk":
             return 81
-        case "goon":
+        case "golem":
             return 82
-        case "hatter":
+        case "goon":
             return 83
-        case "heretic":
+        case "hatter":
             return 84
-        case "klutz":
+        case "heretic":
             return 85
-        case "lunatic":
+        case "klutz":
             return 86
-        case "moonchild":
+        case "lunatic":
             return 87
-        case "mutant":
+        case "moonchild":
             return 88
-        case "ogre":
+        case "mutant":
             return 89
-        case "plague doctor":
+        case "ogre":
             return 90
-        case "politician":
+        case "plague doctor":
             return 91
-        case "puzzlemaster":
+        case "politician":
             return 92
-        case "recluse":
+        case "puzzlemaster":
             return 93
-        case "saint":
+        case "recluse":
             return 94
-        case "snitch":
+        case "saint":
             return 95
-        case "sweetheart":
+        case "snitch":
             return 96
-        case "tinker":
+        case "sweetheart":
             return 97
-        case "zealot":
+        case "tinker":
             return 98
-        case "outsider":
+        case "zealot":
             return 99
+        case "homebrew outsider":
+            return 100
+        case "outsider":
+            return 101
         #Minions
         case "assassin":
-            return 106
-        case "baron":
-            return 107
-        case "boffin":
             return 108
-        case "boomdandy":
+        case "baron":
             return 109
-        case "cerenovus":
+        case "boffin":
             return 110
-        case "devil's advocate":
+        case "boomdandy":
             return 111
-        case "evil twin":
+        case "cerenovus":
             return 112
-        case "fearmonger":
+        case "devil's advocate":
             return 113
-        case "goblin":
+        case "evil twin":
             return 114
-        case "godfather":
+        case "fearmonger":
             return 115
-        case "harpy":
+        case "goblin":
             return 116
-        case "marionette":
+        case "godfather":
             return 117
-        case "mastermind":
+        case "harpy":
             return 118
-        case "mezepheles":
+        case "marionette":
             return 119
-        case "organ grinder":
+        case "mastermind":
             return 120
-        case "pit-hag":
+        case "mezepheles":
             return 121
-        case "poisoner":
+        case "organ grinder":
             return 122
-        case "psychopath":
+        case "pit-hag":
             return 123
-        case "scarlet woman":
+        case "poisoner":
             return 124
-        case "spy":
+        case "psychopath":
             return 125
-        case "summoner":
+        case "scarlet woman":
             return 126
-        case "vizier":
+        case "spy":
             return 127
-        case "widow":
+        case "summoner":
             return 128
-        case "witch":
+        case "vizier":
             return 129
-        case "minion":
+        case "widow":
             return 130
+        case "witch":
+            return 131
+        case "homebrew minion":
+            return 132
+        case "minion":
+            return 133
         #Demons
         case "al-hadikhia":
-            return 134
-        case "fang gu":
-            return 135
-        case "imp":
-            return 136
-        case "kazali":
             return 137
-        case "legion":
+        case "fang gu":
             return 138
-        case "leviathan":
+        case "imp":
             return 139
-        case "lil' monsta":
+        case "kazali":
             return 140
-        case "lleech":
+        case "legion":
             return 141
-        case "lord of typhon":
+        case "leviathan":
             return 142
-        case "no dashii":
+        case "lil' monsta":
             return 143
-        case "ojo":
+        case "lleech":
             return 144
-        case "po":
+        case "lord of typhon":
             return 145
-        case "pukka":
+        case "no dashii":
             return 146
-        case "riot":
+        case "ojo":
             return 147
-        case "shabaloth":
+        case "po":
             return 148
-        case "vigormortis":
+        case "pukka":
             return 149
-        case "vortox":
+        case "riot":
             return 150
-        case "yaggababble":
+        case "shabaloth":
             return 151
-        case "zombuul":
+        case "vigormortis":
             return 152
-        case "demon":
+        case "vortox":
             return 153
+        case "yaggababble":
+            return 154
+        case "zombuul":
+            return 155
+        case "homebrew demon":
+            return 156
+        case "demon":
+            return 157
         #Totals
         case "total good":
-            return 102
+            return 104
         case "total evil":
-            return 156
+            return 160
         case "total":
-            return 157
+            return 161
         #Error case if not found
         case _:
             return 0
