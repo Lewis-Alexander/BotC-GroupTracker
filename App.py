@@ -75,7 +75,7 @@ async def playeraverage(interaction: discord.Interaction, player: str):
         for i in range(3):       
             cell = str(column)+str(rows[i])
             data.append(sheet[cell].value)
-        await interaction.response.send_message(f'{player}s average winrates are as follows: Good-{data[0]} Evil-{data[1]} Total-{data[2]}')
+        await interaction.response.send_message(f'{player}\'s average winrates are as follows: Good-{data[0]} Evil-{data[1]} Total-{data[2]}')
 
 
 @bot.tree.command(name="roletotalstats", description="Check the stats for a particular role")
@@ -123,6 +123,7 @@ async def updatespreadsheet(interaction: discord.Interaction)-> None:
     my_file = Path("Results.csv")
     if my_file.is_file():
         data = separateFile()
+        print(data)
         updateStats(data)
         await interaction.response.send_message(f'spreadsheet updated', ephemeral=True)   
 
@@ -238,6 +239,8 @@ def GetPlayerFromDiscord(name: str) -> str:
         
 def FindPlayer(player: str) -> chr:
     match player:
+        case "total":
+            return "D"
         case "oliver":
             return "I"
         case "sophie":
@@ -624,7 +627,7 @@ def replaceRoleArray(Role: array) ->array:
     return FixedRole
 
 def updateGoodStat(column: int, row: int, good_win: int) -> None:
-    if(good_win != ['1']): #since good has not won increment lost instead of win
+    if(good_win == ['0']): #since good has not won increment lost instead of win
         column = incrementcol(column)
     cell = str(column) + str(row)
     value = sheet[cell].value
@@ -657,8 +660,13 @@ def updateStats(Data: array) -> None:
             Player.append(entry)
         i += 1
     i = 0
+    print(Role)
+    print(Player)
     column = replacePlayerArray(Player)
     row = replaceRoleArray(Role)
+    print(column)
+    print(row)
+    print(good_win)
     for entry in row:
         if(row[i] >= 106):
             updateEvilStat(column[i],row[i],good_win)
