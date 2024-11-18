@@ -19,7 +19,7 @@ async def on_ready():
     print(f'Running as {bot.user}')
     print(bot.user.id)
 
-guild = discord.Object(id=token)
+guild = discord.Object(id='1303745588302708807')
 @bot.command()
 @commands.guild_only()
 @commands.is_owner()  # Prevent other people from using the command
@@ -279,4 +279,4 @@ def decrement_char(char: chr):
             return chr(ord(char) - 1)
 
 
-bot.run('MTMwMzcxOTAwOTc5NTA0NzUyNg.GWHdIn.4qN6deiWx2QhX6rsC-YBQlPTeAjOKcMK90dbqM')
+bot.run(token)
