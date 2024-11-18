@@ -1,3 +1,5 @@
+import Getters
+
 def get_player_from_discord(name: str) -> str:
     match name:
         case "rainbowhead":
@@ -271,7 +273,7 @@ def find_role(Role: str) -> int:
         case "homebrew townsfolk":
             return 73
         case "townsfolk":
-            return 74
+            return Getters.get_townsfolk()
         #Outsiders
         case "barber":
             return 78
@@ -320,7 +322,7 @@ def find_role(Role: str) -> int:
         case "homebrew outsider":
             return 100
         case "outsider":
-            return 101
+            return Getters.get_outsider()
         #Minions
         case "assassin":
             return 108
@@ -373,7 +375,7 @@ def find_role(Role: str) -> int:
         case "homebrew minion":
             return 132
         case "minion":
-            return 133
+            return Getters.get_minion()
         #Demons
         case "al-hadikhia":
             return 137
@@ -416,14 +418,14 @@ def find_role(Role: str) -> int:
         case "homebrew demon":
             return 156
         case "demon":
-            return 157
+            return Getters.get_demon()
         #Totals
         case "total good":
-            return 104
+            return Getters.get_average_good()
         case "total evil":
-            return 160
+            return Getters.get_average_evil()
         case "total":
-            return 161
+            return Getters.get_average_total()
         #Error case if not found
         case _:
             return 0
