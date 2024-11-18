@@ -3,6 +3,7 @@ import csv
 import array
 import discord
 import Switches
+import Getters
 from Token import token
 from discord import app_commands
 from discord.ext import commands
@@ -12,7 +13,6 @@ from pathlib import Path
 bot = commands.Bot(command_prefix='!', intents = discord.Intents.all())
 workbook = xw.Book('BotC-Stats.xlsx')
 sheet = workbook.sheets['Sheet1']
-
 
 @bot.event
 async def on_ready():
@@ -37,13 +37,15 @@ async def personal_average(interaction: discord.Interaction):
     column = Switches.get_player_from_discord(interaction.user.name)
     column = increment_col(column)
     column = increment_col(column)
-    cell = str(column)+str(102)
+    cell = str(column)+str(Getters.get_average_good)
     TotalGood = sheet[cell].value
-    cell = str(column)+str(156)
+    cell = str(column)+str(Getters.get_average_evil)
     TotalEvil = sheet[cell].value
-    cell = str(column)+str(157)
+    cell = str(column)+str(Getters.get_average_total)
     Total = sheet[cell].value
-    await interaction.response.send_message(f"Your average winrate is {str(Total)} consisting of {str(TotalGood)} whilst good and {str(TotalEvil)} whilst evil!", ephemeral=True)
+    cell = str(column)+str(Getters.get_total_played)
+    Played = sheet[cell].value
+    await interaction.response.send_message(f"Over {str(Played)} games played your average winrate was {str(Total)} consisting of {str(TotalGood)} whilst good and {str(TotalEvil)} whilst evil!", ephemeral=True)
 
 
 
@@ -73,7 +75,7 @@ async def player_average(interaction: discord.Interaction, player: str):
         column = increment_col(column)
         column = increment_col(column)
         data = []
-        rows = [Switches.find_role('total good'),Switches.find_role('total evil'),Switches.find_role('total')]
+        rows = [Getters.get_average_good(),Getters.get_average_evil(),Getters.get_average_total()]
         for i in range(3):       
             cell = str(column)+str(rows[i])
             data.append(sheet[cell].value)
@@ -141,7 +143,7 @@ async def update_role(interaction : discord.Interaction):
     column = Switches.get_player_from_discord(member.name)
     column = increment_col(column)
     column = increment_col(column)
-    cell = column + '158'
+    cell = column + str(Getters.get_total_played)
     cellval = sheet[cell].value
     if(cellval < 20):
         await member.add_roles(role0)
@@ -167,7 +169,35 @@ async def update_role(interaction : discord.Interaction):
         await member.remove_roles(role80)
         await interaction.response.send_message(f'You have been assigned the 100+ games role as you have attended enough to increase', ephemeral=True)
         
-        
+@bot.tree.command(name="highest_role_winrate", description="highest winrate for each role")
+@app_commands.describe(role = 'Role you would like to check (Townsfolk for Townsfolk total and Total Good for all good)')
+async def highest_role_winrate(interaction : discord.Interaction, role : str):
+    column = Getters.get_starting_player_percentage_column()
+    row = Switches.find_role(role.lower())
+    if(row == 0):
+        await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True)
+    data = []
+    for player in Getters.get_playercount():
+        cell = str(column)+str(Getters.get_average_good)
+        data.append(sheet[cell].value)
+        for i in range(5):
+            column = increment_col(column)
+    sorteddata = data.sort(-1)
+    i = 0
+    for entry in data:
+        if(sorteddata[0] == data[i]):
+            highestindex = i
+        i += 1
+    column = Getters.get_starting_player_win_column()
+    for index in highestindex:
+        for i in range(5):
+            column = increment_col(column)
+    cell = str(column) + str(1)
+    name = sheet[cell].value
+    await interaction.response.send_message(f'{name} has the highest winrate as the/a {role} which is {sorteddata[0]}')
+    
+
+
 def separate_file() -> array:
     with open('results.csv', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
