@@ -125,7 +125,6 @@ async def update_spreadsheet(interaction: discord.Interaction)-> None:
     my_file = Path("Results.csv")
     if my_file.is_file():
         data = separate_file()
-        print(data)
         update_stats(data)
         await interaction.response.send_message(f'spreadsheet updated', ephemeral=True)   
 
@@ -194,7 +193,7 @@ def replace_role_array(Role: array) ->array:
     return FixedRole
 
 def update_good_stat(column: int, row: int, good_win: int) -> None:
-    if(good_win == ['0']): #since good has not won increment lost instead of win
+    if(good_win[0] == '0'): #since good has not won increment lost instead of win
         column = increment_col(column)
     cell = str(column) + str(row)
     value = sheet[cell].value
@@ -205,7 +204,7 @@ def update_good_stat(column: int, row: int, good_win: int) -> None:
     
 
 def update_evil_stat(column: int, row: int, good_win: int) -> None:
-    if(good_win == ['1']): #since good has won evil has not and thus must increment lost instead
+    if(good_win[0] == '1'): #since good has won evil has not and thus must increment lost instead
         column = increment_col(column)
     cell = str(column) + str(row)
     value = sheet[cell].value
@@ -227,13 +226,8 @@ def update_stats(Data: array) -> None:
             Player.append(entry)
         i += 1
     i = 0
-    print(Role)
-    print(Player)
     column = replace_player_array(Player)
     row = replace_role_array(Role)
-    print(column)
-    print(row)
-    print(good_win)
     for entry in row:
         if(row[i] >= 106):
             update_evil_stat(column[i],row[i],good_win)
