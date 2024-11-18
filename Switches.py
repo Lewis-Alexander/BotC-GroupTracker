@@ -1,4 +1,4 @@
-def GetPlayerFromDiscord(name: str) -> str:
+def get_player_from_discord(name: str) -> str:
     match name:
         case "rainbowhead":
             return "AH"
@@ -64,7 +64,7 @@ def GetPlayerFromDiscord(name: str) -> str:
             return "ERROR"
 
         
-def FindPlayer(player: str) -> chr:
+def find_player(player: str) -> chr:
     match player:
         case "total":
             return "D"
@@ -129,7 +129,7 @@ def FindPlayer(player: str) -> chr:
         case _: #Error if not found player
             return "ERROR"
         
-def FindRole(Role: str) -> int:
+def find_role(Role: str) -> int:
     match Role:
         #Townsfolk
         case "acrobat":

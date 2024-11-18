@@ -32,11 +32,11 @@ async def sync(ctx: commands.Context) -> None:
         print(e)
     
 
-@bot.tree.command(name="personalaverage", description="Check your average winrates for sides")
-async def personalaverage(interaction: discord.Interaction):
-    column = Switches.GetPlayerFromDiscord(interaction.user.name)
-    column = incrementcol(column)
-    column = incrementcol(column)
+@bot.tree.command(name="personal_average", description="Check your average winrates for sides")
+async def personal_average(interaction: discord.Interaction):
+    column = Switches.get_player_from_discord(interaction.user.name)
+    column = increment_col(column)
+    column = increment_col(column)
     cell = str(column)+str(102)
     TotalGood = sheet[cell].value
     cell = str(column)+str(156)
@@ -47,12 +47,12 @@ async def personalaverage(interaction: discord.Interaction):
 
 
 
-@bot.tree.command(name="personalrolestats", description="Check any your stats for a particular role")
+@bot.tree.command(name="personal_role_stats", description="Check any your stats for a particular role")
 @app_commands.describe(role = 'Role you would like to check (Townsfolk for Townsfolk total and Total Good for all good)')
-async def personalrolestats(interaction: discord.Interaction, role: str):
-    column = Switches.GetPlayerFromDiscord(interaction.user.name)
-    column = decrementcol(column)
-    row = Switches.FindRole(role.lower())
+async def personal_role_stats(interaction: discord.Interaction, role: str):
+    column = Switches.get_player_from_discord(interaction.user.name)
+    column = decrement_col(column)
+    row = Switches.find_role(role.lower())
     if(row == 0):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True)
     else:
@@ -60,30 +60,30 @@ async def personalrolestats(interaction: discord.Interaction, role: str):
         for i in range(4):     
             cell = str(column)+str(row)
             data.append(sheet[cell].value)
-            column = incrementcol(column)
+            column = increment_col(column)
         await interaction.response.send_message(f'you have played the {role} {data[0]} times, of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.')
 
-@bot.tree.command(name="playeraverage", description="Check any players average winrates")
+@bot.tree.command(name="player_average", description="Check any players average winrates")
 @app_commands.describe(player = 'Player you would like to see the averages for')
-async def playeraverage(interaction: discord.Interaction, player: str):
-    column = Switches.FindPlayer(player.lower())
+async def player_average(interaction: discord.Interaction, player: str):
+    column = Switches.find_player(player.lower())
     if(column == "ERROR"):
         await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
     else:
-        column = incrementcol(column)
-        column = incrementcol(column)
+        column = increment_col(column)
+        column = increment_col(column)
         data = []
-        rows = [Switches.FindRole('total good'),Switches.FindRole('total evil'),Switches.FindRole('total')]
+        rows = [Switches.find_role('total good'),Switches.find_role('total evil'),Switches.find_role('total')]
         for i in range(3):       
             cell = str(column)+str(rows[i])
             data.append(sheet[cell].value)
         await interaction.response.send_message(f'{player}\'s average winrates are as follows: Good-{data[0]} Evil-{data[1]} Total-{data[2]}')
 
 
-@bot.tree.command(name="roletotalstats", description="Check the stats for a particular role")
+@bot.tree.command(name="role_total_stats", description="Check the stats for a particular role")
 @app_commands.describe(role = 'Role you would like to check, (Townsfolk for Townsfolk total and Total Good for all good)')
-async def roletotalstats(interaction: discord.Interaction, role: str):
-    row = Switches.FindRole(role.lower())
+async def role_total_stats(interaction: discord.Interaction, role: str):
+    row = Switches.find_role(role.lower())
     if(row == 0):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True) 
     else: 
@@ -92,15 +92,15 @@ async def roletotalstats(interaction: discord.Interaction, role: str):
         for i in range(4):       
                 cell = str(column)+str(row)
                 data.append(sheet[cell].value)
-                column = incrementcol(column)
+                column = increment_col(column)
         await interaction.response.send_message(f'The {role} has been played {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.')
 
-@bot.tree.command(name='playerrolestats', description="Check any players stats for a particular role")
+@bot.tree.command(name='player_role_stats', description="Check any players stats for a particular role")
 @app_commands.describe(role = 'Role you would like to check, (Townsfolk for Townsfolk total and Total Good for all good)')
 @app_commands.describe(player = 'Player you would like to check (same name as on spreadsheet)')
-async def playerrolestats(interaction: discord.Interaction, role: str, player: str):
-    row = Switches.FindRole(role.lower())
-    column = Switches.FindPlayer(player.lower())
+async def player_role_stats(interaction: discord.Interaction, role: str, player: str):
+    row = Switches.find_role(role.lower())
+    column = Switches.find_player(player.lower())
     if(row == 0):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True)
     elif(column == "ERROR"):
@@ -110,27 +110,27 @@ async def playerrolestats(interaction: discord.Interaction, role: str, player: s
         for i in range(4):       
                 cell = str(column)+str(row)
                 data.append(sheet[cell].value)
-                column = incrementcol(column)
+                column = increment_col(column)
         await interaction.response.send_message(f'{player} has played {role} {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)   
     
         
 
-@bot.tree.command(name="uploaddatabase", description="Uploads the current entire database to be checked")
-async def uploaddatabase(interaction: discord.Interaction):
+@bot.tree.command(name="upload_database", description="Uploads the current entire database to be checked")
+async def upload_database(interaction: discord.Interaction):
     await interaction.response.send_message(file=discord.File(r'BotC-Stats.xlsx'))
 
 @commands.is_owner()  # Prevent other people from using the command
-@bot.tree.command(name="updatespreadsheet", description="if program has a csv file it uses it to update the spreadsheet")
-async def updatespreadsheet(interaction: discord.Interaction)-> None:
+@bot.tree.command(name="update_spreadsheet", description="if program has a csv file it uses it to update the spreadsheet")
+async def update_spreadsheet(interaction: discord.Interaction)-> None:
     my_file = Path("Results.csv")
     if my_file.is_file():
-        data = separateFile()
+        data = separate_file()
         print(data)
-        updateStats(data)
+        update_stats(data)
         await interaction.response.send_message(f'spreadsheet updated', ephemeral=True)   
 
-@bot.tree.command(name="updaterole", description="auto update roles from database")
-async def updateroles(interaction : discord.Interaction):
+@bot.tree.command(name="update_role", description="auto update personal role from database")
+async def update_role(interaction : discord.Interaction):
     server = bot.get_guild(1192193425739612281)
     role0 = server.get_role(1294069983151919134)
     role20 = server.get_role(1294281073043177535)
@@ -139,9 +139,9 @@ async def updateroles(interaction : discord.Interaction):
     role80 = server.get_role(1294068801448574996)
     role100 = server.get_role(1294068667801276426)
     member = interaction.user
-    column = Switches.GetPlayerFromDiscord(member.name)
-    column = incrementcol(column)
-    column = incrementcol(column)
+    column = Switches.get_player_from_discord(member.name)
+    column = increment_col(column)
+    column = increment_col(column)
     cell = column + '158'
     cellval = sheet[cell].value
     if(cellval < 20):
@@ -169,7 +169,7 @@ async def updateroles(interaction : discord.Interaction):
         await interaction.response.send_message(f'You have been assigned the 100+ games role as you have attended enough to increase', ephemeral=True)
         
         
-def separateFile() -> array:
+def separate_file() -> array:
     with open('results.csv', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         Data = []
@@ -177,25 +177,25 @@ def separateFile() -> array:
             Data.append(row)
         return Data
 
-def replacePlayerArray(Player: array) ->array:
+def replace_player_array(Player: array) ->array:
     FixedPlayer = []
     for entry in Player:
         player = entry[0]
         player = player.lower()
-        FixedPlayer.append(Switches.FindPlayer(player))
+        FixedPlayer.append(Switches.find_player(player))
     return FixedPlayer
 
-def replaceRoleArray(Role: array) ->array:
+def replace_role_array(Role: array) ->array:
     FixedRole = []
     for entry in Role:
         role = entry[0]
         role = role.lower()
-        FixedRole.append(Switches.FindRole(role))
+        FixedRole.append(Switches.find_role(role))
     return FixedRole
 
-def updateGoodStat(column: int, row: int, good_win: int) -> None:
+def update_good_stat(column: int, row: int, good_win: int) -> None:
     if(good_win == ['0']): #since good has not won increment lost instead of win
-        column = incrementcol(column)
+        column = increment_col(column)
     cell = str(column) + str(row)
     value = sheet[cell].value
     value += 1
@@ -204,9 +204,9 @@ def updateGoodStat(column: int, row: int, good_win: int) -> None:
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
     
 
-def updateEvilStat(column: int, row: int, good_win: int) -> None:
+def update_evil_stat(column: int, row: int, good_win: int) -> None:
     if(good_win == ['1']): #since good has won evil has not and thus must increment lost instead
-        column = incrementcol(column)
+        column = increment_col(column)
     cell = str(column) + str(row)
     value = sheet[cell].value
     value += 1
@@ -214,7 +214,7 @@ def updateEvilStat(column: int, row: int, good_win: int) -> None:
     workbook.save()
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
 
-def updateStats(Data: array) -> None:
+def update_stats(Data: array) -> None:
     i = 0
     Player = []
     Role = []
@@ -229,19 +229,19 @@ def updateStats(Data: array) -> None:
     i = 0
     print(Role)
     print(Player)
-    column = replacePlayerArray(Player)
-    row = replaceRoleArray(Role)
+    column = replace_player_array(Player)
+    row = replace_role_array(Role)
     print(column)
     print(row)
     print(good_win)
     for entry in row:
         if(row[i] >= 106):
-            updateEvilStat(column[i],row[i],good_win)
+            update_evil_stat(column[i],row[i],good_win)
         else:
-            updateGoodStat(column[i],row[i],good_win)
+            update_good_stat(column[i],row[i],good_win)
         i += 1
 
-def incrementcol(string: str):
+def increment_col(string: str):
     lst = list(string) 
     result = []
     while lst:
@@ -260,7 +260,7 @@ def increment_char(char: chr):
         else:
             return 0, chr(ord(char) + 1)
 
-def decrementcol(string: str):
+def decrement_col(string: str):
     lst = list(string)
     result = []
     index = 0
