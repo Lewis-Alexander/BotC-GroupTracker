@@ -177,24 +177,39 @@ async def highest_role_winrate(interaction : discord.Interaction, role : str):
     if(row == 0):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True)
     data = []
-    for player in Getters.get_playercount():
-        cell = str(column)+str(Getters.get_average_good)
-        data.append(sheet[cell].value)
+    for player in range (Getters.get_playercount()):
+        cell = str(column)+str(row)
+        tempdata = sheet[cell].value
+        tempdata = tempdata[:-1]
+        data.append(float(tempdata))
         for i in range(5):
             column = increment_col(column)
-    sorteddata = data.sort(-1)
+    unsorteddata = data.copy()
+    data.sort(reverse=True)
     i = 0
+    highestindex = []
     for entry in data:
-        if(sorteddata[0] == data[i]):
-            highestindex = i
+        if(data[0] == unsorteddata[i]):
+            highestindex.append(i)
         i += 1
-    column = Getters.get_starting_player_win_column()
-    for index in highestindex:
-        for i in range(5):
-            column = increment_col(column)
-    cell = str(column) + str(1)
-    name = sheet[cell].value
-    await interaction.response.send_message(f'{name} has the highest winrate as the/a {role} which is {sorteddata[0]}')
+    name = []
+    for value in highestindex:
+        column = Getters.get_starting_player_win_column()
+        for index in range(value):
+            for i in range(5):
+                column = increment_col(column)
+        cell = str(column) + str(1)
+        name.append(sheet[cell].value)
+    if(len(name) > 1):
+        players = f'Multiple players have a tied winrate of {data[0]}% on the {role} those being '
+        for entry in name:
+            if(entry != name[-1]):
+                players += f'{entry}, '
+            else:
+                players += f'and {entry}.'
+        await interaction.response.send_message(f'{players}')
+    else:
+        await interaction.response.send_message(f'{name} has the highest winrate as the/a {role} which is {data[0]}%')
     
 
 
