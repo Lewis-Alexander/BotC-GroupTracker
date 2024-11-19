@@ -1,5 +1,3 @@
-import csv
-import array
 import discord
 import Switches
 import Getters
@@ -121,7 +119,7 @@ async def upload_spreadsheet(interaction: discord.Interaction):
 
 @commands.is_owner()  # Prevent other people from using the command
 @bot.tree.command(name="update_spreadsheet", description="if program has a csv file it uses it to update the spreadsheet")
-async def update_spreadsheet(interaction: discord.Interaction)-> None:
+async def update_spreadsheet(interaction: discord.Interaction):
     my_file = Path("Results.csv")
     if my_file.is_file():
         data = Helper.separate_file()
