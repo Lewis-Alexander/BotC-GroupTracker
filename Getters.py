@@ -14,7 +14,7 @@ def get_minion() -> int:
 def get_demon() -> int:
     return 157
 def get_total_played() -> int:
-    return 158
+    return 162
 def get_win_column_total() -> str:
     return 'D'
 def get_starting_player_win_column():

@@ -1,9 +1,9 @@
-import xlwings as xw
 import csv
 import array
 import discord
 import Switches
 import Getters
+import Helper
 from Token import token
 from discord import app_commands
 from discord.ext import commands
@@ -11,8 +11,6 @@ from pathlib import Path
 
 #------bot stuff--------
 bot = commands.Bot(command_prefix='!', intents = discord.Intents.all())
-workbook = xw.Book('BotC-Stats.xlsx')
-sheet = workbook.sheets['Sheet1']
 
 @bot.event
 async def on_ready():
@@ -35,16 +33,16 @@ async def sync(ctx: commands.Context) -> None:
 @bot.tree.command(name="personal_average", description="Check your average winrates for sides")
 async def personal_average(interaction: discord.Interaction):
     column = Switches.get_player_from_discord(interaction.user.name)
-    column = increment_col(column)
-    column = increment_col(column)
-    cell = str(column)+str(Getters.get_average_good)
-    TotalGood = sheet[cell].value
-    cell = str(column)+str(Getters.get_average_evil)
-    TotalEvil = sheet[cell].value
-    cell = str(column)+str(Getters.get_average_total)
-    Total = sheet[cell].value
-    cell = str(column)+str(Getters.get_total_played)
-    Played = sheet[cell].value
+    column = Helper.increment_col(column)
+    column = Helper.increment_col(column)
+    cell = str(column)+str(Getters.get_average_good())
+    TotalGood = Helper.sheet[cell].value
+    cell = str(column)+str(Getters.get_average_evil())
+    TotalEvil = Helper.sheet[cell].value
+    cell = str(column)+str(Getters.get_average_total())
+    Total = Helper.sheet[cell].value
+    cell = str(column)+str(Getters.get_total_played())
+    Played = Helper.sheet[cell].value
     await interaction.response.send_message(f"Over {str(Played)} games played your average winrate was {str(Total)} consisting of {str(TotalGood)} whilst good and {str(TotalEvil)} whilst evil!", ephemeral=True)
 
 
@@ -53,7 +51,7 @@ async def personal_average(interaction: discord.Interaction):
 @app_commands.describe(role = 'Role you would like to check (Townsfolk for Townsfolk total and Total Good for all good)')
 async def personal_role_stats(interaction: discord.Interaction, role: str):
     column = Switches.get_player_from_discord(interaction.user.name)
-    column = decrement_col(column)
+    column = Helper.decrement_col(column)
     row = Switches.find_role(role.lower())
     if(row == 0):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True)
@@ -61,8 +59,8 @@ async def personal_role_stats(interaction: discord.Interaction, role: str):
         data = []
         for i in range(4):     
             cell = str(column)+str(row)
-            data.append(sheet[cell].value)
-            column = increment_col(column)
+            data.append(Helper.sheet[cell].value)
+            column = Helper.increment_col(column)
         await interaction.response.send_message(f'you have played the {role} {data[0]} times, of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.')
 
 @bot.tree.command(name="player_average", description="Check any players average winrates")
@@ -72,13 +70,13 @@ async def player_average(interaction: discord.Interaction, player: str):
     if(column == "ERROR"):
         await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
     else:
-        column = increment_col(column)
-        column = increment_col(column)
+        column = Helper.increment_col(column)
+        column = Helper.increment_col(column)
         data = []
         rows = [Getters.get_average_good(),Getters.get_average_evil(),Getters.get_average_total()]
         for i in range(3):       
             cell = str(column)+str(rows[i])
-            data.append(sheet[cell].value)
+            data.append(Helper.sheet[cell].value)
         await interaction.response.send_message(f'{player}\'s average winrates are as follows: Good-{data[0]} Evil-{data[1]} Total-{data[2]}')
 
 
@@ -93,8 +91,8 @@ async def role_total_stats(interaction: discord.Interaction, role: str):
         data = []
         for i in range(4):       
                 cell = str(column)+str(row)
-                data.append(sheet[cell].value)
-                column = increment_col(column)
+                data.append(Helper.sheet[cell].value)
+                column = Helper.increment_col(column)
         await interaction.response.send_message(f'The {role} has been played {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.')
 
 @bot.tree.command(name='player_role_stats', description="Check any players stats for a particular role")
@@ -111,14 +109,14 @@ async def player_role_stats(interaction: discord.Interaction, role: str, player:
         data = []
         for i in range(4):       
                 cell = str(column)+str(row)
-                data.append(sheet[cell].value)
-                column = increment_col(column)
+                data.append(Helper.sheet[cell].value)
+                column = Helper.increment_col(column)
         await interaction.response.send_message(f'{player} has played {role} {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)   
     
         
 
-@bot.tree.command(name="upload_database", description="Uploads the current entire database to be checked")
-async def upload_database(interaction: discord.Interaction):
+@bot.tree.command(name="upload_spreadsheet", description="Uploads the current entire spreadsheet to be perused at your pleasure")
+async def upload_spreadsheet(interaction: discord.Interaction):
     await interaction.response.send_message(file=discord.File(r'BotC-Stats.xlsx'))
 
 @commands.is_owner()  # Prevent other people from using the command
@@ -126,8 +124,8 @@ async def upload_database(interaction: discord.Interaction):
 async def update_spreadsheet(interaction: discord.Interaction)-> None:
     my_file = Path("Results.csv")
     if my_file.is_file():
-        data = separate_file()
-        update_stats(data)
+        data = Helper.separate_file()
+        Helper.update_stats(data)
         await interaction.response.send_message(f'spreadsheet updated', ephemeral=True)   
 
 @bot.tree.command(name="update_role", description="auto update personal role from database")
@@ -141,10 +139,10 @@ async def update_role(interaction : discord.Interaction):
     role100 = server.get_role(1294068667801276426)
     member = interaction.user
     column = Switches.get_player_from_discord(member.name)
-    column = increment_col(column)
-    column = increment_col(column)
-    cell = column + str(Getters.get_total_played)
-    cellval = sheet[cell].value
+    column = Helper.increment_col(column)
+    column = Helper.increment_col(column)
+    cell = column + str(Getters.get_total_played())
+    cellval = Helper.sheet[cell].value
     if(cellval < 20):
         await member.add_roles(role0)
         await interaction.response.send_message(f'You have been assigned the 0+ games role as you have not yet attended enough to increase', ephemeral=True)
@@ -179,11 +177,11 @@ async def highest_role_winrate(interaction : discord.Interaction, role : str):
     data = []
     for player in range (Getters.get_playercount()):
         cell = str(column)+str(row)
-        tempdata = sheet[cell].value
+        tempdata = Helper.sheet[cell].value
         tempdata = tempdata[:-1]
         data.append(float(tempdata))
         for i in range(5):
-            column = increment_col(column)
+            column = Helper.increment_col(column)
     unsorteddata = data.copy()
     data.sort(reverse=True)
     i = 0
@@ -197,9 +195,9 @@ async def highest_role_winrate(interaction : discord.Interaction, role : str):
         column = Getters.get_starting_player_win_column()
         for index in range(value):
             for i in range(5):
-                column = increment_col(column)
+                column = Helper.increment_col(column)
         cell = str(column) + str(1)
-        name.append(sheet[cell].value)
+        name.append(Helper.sheet[cell].value)
     if(len(name) > 1):
         players = f'Multiple players have a tied winrate of {data[0]}% on the {role} those being '
         for entry in name:
@@ -209,113 +207,8 @@ async def highest_role_winrate(interaction : discord.Interaction, role : str):
                 players += f'and {entry}.'
         await interaction.response.send_message(f'{players}')
     else:
-        await interaction.response.send_message(f'{name} has the highest winrate as the/a {role} which is {data[0]}%')
+        await interaction.response.send_message(f'{name[0]} has the highest winrate as the/a {role} which is {data[0]}%')
     
-
-
-def separate_file() -> array:
-    with open('results.csv', newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',')
-        Data = []
-        for row in reader:
-            Data.append(row)
-        return Data
-
-def replace_player_array(Player: array) ->array:
-    FixedPlayer = []
-    for entry in Player:
-        player = entry[0]
-        player = player.lower()
-        FixedPlayer.append(Switches.find_player(player))
-    return FixedPlayer
-
-def replace_role_array(Role: array) ->array:
-    FixedRole = []
-    for entry in Role:
-        role = entry[0]
-        role = role.lower()
-        FixedRole.append(Switches.find_role(role))
-    return FixedRole
-
-def update_good_stat(column: int, row: int, good_win: int) -> None:
-    if(good_win[0] == '0'): #since good has not won increment lost instead of win
-        column = increment_col(column)
-    cell = str(column) + str(row)
-    value = sheet[cell].value
-    value += 1
-    sheet[cell].value = value
-    workbook.save()
-    workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
-    
-
-def update_evil_stat(column: int, row: int, good_win: int) -> None:
-    if(good_win[0] == '1'): #since good has won evil has not and thus must increment lost instead
-        column = increment_col(column)
-    cell = str(column) + str(row)
-    value = sheet[cell].value
-    value += 1
-    sheet[cell].value = value
-    workbook.save()
-    workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
-
-def update_stats(Data: array) -> None:
-    i = 0
-    Player = []
-    Role = []
-    for entry in Data:
-        if(i == 0):
-            good_win = entry
-        elif(i % 2 == 0):
-            Role.append(entry)
-        else:
-            Player.append(entry)
-        i += 1
-    i = 0
-    column = replace_player_array(Player)
-    row = replace_role_array(Role)
-    for entry in row:
-        if(row[i] >= 106):
-            update_evil_stat(column[i],row[i],good_win)
-        else:
-            update_good_stat(column[i],row[i],good_win)
-        i += 1
-
-def increment_col(string: str):
-    lst = list(string) 
-    result = []
-    while lst:
-        carry, next_ = increment_char(lst.pop())
-        result.append(next_)
-        if not carry:
-            break
-        if not lst:
-            result.append('A')   
-    result += lst[::-1]
-    return ''.join(result[::-1])
-
-def increment_char(char: chr):
-        if char in ('Z'):
-            return 1, 'A'
-        else:
-            return 0, chr(ord(char) + 1)
-
-def decrement_col(string: str):
-    lst = list(string)
-    result = []
-    index = 0
-    for char in lst:
-        if(char == lst[len(lst)-1]):
-            char = decrement_char(char)
-        if(char != 'ERROR'):
-            result.append(char)
-        index += 1
-    return ''.join(result)
-
-def decrement_char(char: chr):
-        if char in ('A'):
-            return 'ERROR'
-        else:
-            return chr(ord(char) - 1)
 
 
 bot.run(token)
