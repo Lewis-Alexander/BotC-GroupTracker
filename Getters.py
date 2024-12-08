@@ -24,4 +24,4 @@ def total_percentage_column() -> str:
 def get_starting_player_percentage_column() -> str:
     return 'K'
 def get_playercount() -> int:
-    return 29
+    return 30

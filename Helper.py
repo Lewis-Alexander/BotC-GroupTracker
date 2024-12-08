@@ -34,6 +34,7 @@ def update_good_stat(column: int, row: int, good_win: int) -> None:
     if(good_win[0] == '0'): #since good has not won increment lost instead of win
         column = increment_col(column)
     cell = str(column) + str(row)
+    print(cell)
     value = sheet[cell].value
     value += 1
     sheet[cell].value = value
