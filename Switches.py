@@ -88,6 +88,8 @@ def find_player(player: str) -> chr:
             return "AR" 
         case "ant":
             return "AW"
+        case "antknee":
+            return "AW"
         case "ronnie":
             return "BB"
         case "ian":
@@ -128,6 +130,8 @@ def find_player(player: str) -> chr:
             return "EN"
         case "tj":
             return "ES"
+        case "nonplayer":
+            return "EX"
         case _: #Error if not found player
             return "ERROR"
         
