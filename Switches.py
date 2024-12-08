@@ -150,7 +150,7 @@ def find_role(Role: str) -> int:
             return 9
         case "atheist":
             return 10
-        case "ballonist":
+        case "balloonist":
             return 11
         case "banshee":
             return 12
