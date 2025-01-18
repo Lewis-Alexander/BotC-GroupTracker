@@ -62,6 +62,8 @@ def get_player_from_discord(name: str) -> str:
             return "EN"
         case "thorijus":
             return "ES"
+        case "arcticreaper91":
+            return "EX"
         case _: #Error if not found player
             return "ERROR"
 
@@ -130,8 +132,10 @@ def find_player(player: str) -> chr:
             return "EN"
         case "tj":
             return "ES"
-        case "nonplayer":
+        case "lochlann":
             return "EX"
+        case "nonplayer":
+            return "FC"
         case _: #Error if not found player
             return "ERROR"
         
@@ -376,51 +380,55 @@ def find_role(Role: str) -> int:
             return 130
         case "witch":
             return 131
-        case "homebrew minion":
+        case "wizard":
             return 132
+        case "xaan":
+            return 133
+        case "homebrew minion":
+            return 134
         case "minion":
             return Getters.get_minion()
         #Demons
         case "al-hadikhia":
-            return 137
-        case "fang gu":
-            return 138
-        case "imp":
             return 139
-        case "kazali":
+        case "fang gu":
             return 140
-        case "legion":
+        case "imp":
             return 141
-        case "leviathan":
+        case "kazali":
             return 142
-        case "lil' monsta":
+        case "legion":
             return 143
-        case "lleech":
+        case "leviathan":
             return 144
-        case "lord of typhon":
+        case "lil' monsta":
             return 145
-        case "no dashii":
+        case "lleech":
             return 146
-        case "ojo":
+        case "lord of typhon":
             return 147
-        case "po":
+        case "no dashii":
             return 148
-        case "pukka":
+        case "ojo":
             return 149
-        case "riot":
+        case "po":
             return 150
-        case "shabaloth":
+        case "pukka":
             return 151
-        case "vigormortis":
+        case "riot":
             return 152
-        case "vortox":
+        case "shabaloth":
             return 153
-        case "yaggababble":
+        case "vigormortis":
             return 154
-        case "zombuul":
+        case "vortox":
             return 155
-        case "homebrew demon":
+        case "yaggababble":
             return 156
+        case "zombuul":
+            return 157
+        case "homebrew demon":
+            return 158
         case "demon":
             return Getters.get_demon()
         #Totals
