@@ -18,7 +18,7 @@ def get_player_from_discord(name: str) -> str:
             return "AH"
         case "toomai1970":
             return "AM"
-        case "lazyvult":
+        case "lazymech.":
             return "AR"
         case "antinium1312.":
             return "AW"
@@ -64,6 +64,10 @@ def get_player_from_discord(name: str) -> str:
             return "ES"
         case "arcticreaper91":
             return "EX"
+        case "theytookawaymyzalgo":
+            return "FC"
+        case "aero1908":
+            return "FH"
         case _: #Error if not found player
             return "ERROR"
 
@@ -134,8 +138,12 @@ def find_player(player: str) -> chr:
             return "ES"
         case "lochlann":
             return "EX"
-        case "nonplayer":
+        case "colin":
             return "FC"
+        case "aaron":
+            return "FH"
+        case "nonplayer":
+            return "FR"
         case _: #Error if not found player
             return "ERROR"
         
@@ -244,191 +252,197 @@ def find_role(Role: str) -> int:
             return 54
         case "preacher":
             return 55
-        case "professor":
+        case "princess":
             return 56
-        case "ravenkeeper":
+        case "professor":
             return 57
-        case "sage":
+        case "ravenkeeper":
             return 58
-        case "sailor":
+        case "sage":
             return 59
-        case "savant":
+        case "sailor":
             return 60
-        case "seamstress":
+        case "savant":
             return 61
-        case "shugenja":
+        case "seamstress":
             return 62
-        case "slayer":
+        case "shugenja":
             return 63
-        case "snake Charmer":
+        case "slayer":
             return 64
-        case "soldier":
+        case "snake Charmer":
             return 65
-        case "steward":
+        case "soldier":
             return 66
-        case "tea lady":
+        case "steward":
             return 67
-        case "town crier":
+        case "tea lady":
             return 68
-        case "undertaker":
+        case "town crier":
             return 69
-        case "village idiot":
+        case "undertaker":
             return 70
-        case "virgin":
+        case "village idiot":
             return 71
-        case "washerwoman":
+        case "virgin":
             return 72
-        case "homebrew townsfolk":
+        case "washerwoman":
             return 73
+        case "homebrew townsfolk":
+            return 74
         case "townsfolk":
             return Getters.get_townsfolk()
         #Outsiders
         case "barber":
-            return 78
-        case "butler":
             return 79
-        case "damsel":
+        case "butler":
             return 80
-        case "drunk":
+        case "damsel":
             return 81
-        case "golem":
+        case "drunk":
             return 82
-        case "goon":
+        case "golem":
             return 83
-        case "hatter":
+        case "goon":
             return 84
-        case "heretic":
+        case "hatter":
             return 85
-        case "klutz":
+        case "heretic":
             return 86
-        case "lunatic":
+        case "hermit":
             return 87
-        case "moonchild":
+        case "klutz":
             return 88
-        case "mutant":
+        case "lunatic":
             return 89
-        case "ogre":
+        case "moonchild":
             return 90
-        case "plague doctor":
+        case "mutant":
             return 91
-        case "politician":
+        case "ogre":
             return 92
-        case "puzzlemaster":
+        case "plague doctor":
             return 93
-        case "recluse":
+        case "politician":
             return 94
-        case "saint":
+        case "puzzlemaster":
             return 95
-        case "snitch":
+        case "recluse":
             return 96
-        case "sweetheart":
+        case "saint":
             return 97
-        case "tinker":
+        case "snitch":
             return 98
-        case "zealot":
+        case "sweetheart":
             return 99
-        case "homebrew outsider":
+        case "tinker":
             return 100
+        case "zealot":
+            return 101
+        case "homebrew outsider":
+            return 102
         case "outsider":
             return Getters.get_outsider()
         #Minions
         case "assassin":
-            return 108
-        case "baron":
-            return 109
-        case "boffin":
-            return 110
-        case "boomdandy":
             return 111
-        case "cerenovus":
+        case "baron":
             return 112
-        case "devil's advocate":
+        case "boffin":
             return 113
-        case "evil twin":
+        case "boomdandy":
             return 114
-        case "fearmonger":
+        case "cerenovus":
             return 115
-        case "goblin":
+        case "devil's advocate":
             return 116
-        case "godfather":
+        case "evil twin":
             return 117
-        case "harpy":
+        case "fearmonger":
             return 118
-        case "marionette":
+        case "goblin":
             return 119
-        case "mastermind":
+        case "godfather":
             return 120
-        case "mezepheles":
+        case "harpy":
             return 121
-        case "organ grinder":
+        case "marionette":
             return 122
-        case "pit-hag":
+        case "mastermind":
             return 123
-        case "poisoner":
+        case "mezepheles":
             return 124
-        case "psychopath":
+        case "organ grinder":
             return 125
-        case "scarlet woman":
+        case "pit-hag":
             return 126
-        case "spy":
+        case "poisoner":
             return 127
-        case "summoner":
+        case "psychopath":
             return 128
-        case "vizier":
+        case "scarlet woman":
             return 129
-        case "widow":
+        case "spy":
             return 130
-        case "witch":
+        case "summoner":
             return 131
-        case "wizard":
+        case "vizier":
             return 132
-        case "xaan":
+        case "widow":
             return 133
-        case "homebrew minion":
+        case "witch":
             return 134
+        case "wizard":
+            return 135
+        case "wraith":
+            return 136
+        case "xaan":
+            return 136
+        case "homebrew minion":
+            return 137
         case "minion":
             return Getters.get_minion()
         #Demons
         case "al-hadikhia":
-            return 139
-        case "fang gu":
-            return 140
-        case "imp":
-            return 141
-        case "kazali":
             return 142
-        case "legion":
+        case "fang gu":
             return 143
-        case "leviathan":
+        case "imp":
             return 144
-        case "lil' monsta":
+        case "kazali":
             return 145
-        case "lleech":
+        case "legion":
             return 146
-        case "lord of typhon":
+        case "leviathan":
             return 147
-        case "no dashii":
+        case "lil' monsta":
             return 148
-        case "ojo":
+        case "lleech":
             return 149
-        case "po":
+        case "lord of typhon":
             return 150
-        case "pukka":
+        case "no dashii":
             return 151
-        case "riot":
+        case "ojo":
             return 152
-        case "shabaloth":
+        case "po":
             return 153
-        case "vigormortis":
+        case "pukka":
             return 154
-        case "vortox":
+        case "riot":
             return 155
-        case "yaggababble":
+        case "shabaloth":
             return 156
-        case "zombuul":
+        case "vigormortis":
             return 157
-        case "homebrew demon":
+        case "vortox":
             return 158
+        case "yaggababble":
+            return 159
+        case "zombuul":
+            return 160
+        case "homebrew demon":
+            return 161
         case "demon":
             return Getters.get_demon()
         #Totals

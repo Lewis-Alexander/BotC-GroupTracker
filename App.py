@@ -130,6 +130,7 @@ async def update_spreadsheet(interaction: discord.Interaction):
 async def update_role(interaction : discord.Interaction):
     server = bot.get_guild(1192193425739612281)
     role0 = server.get_role(1294069983151919134)
+    role10 = server.get_role(1451683827897597973)
     role20 = server.get_role(1294281073043177535)
     role40 = server.get_role(1294068836764614788)
     role60 = server.get_role(1294069566409801760)
@@ -141,29 +142,33 @@ async def update_role(interaction : discord.Interaction):
     column = Helper.increment_col(column)
     cell = column + str(Getters.get_total_played())
     cellval = Helper.sheet[cell].value
-    if(cellval < 20):
+    if(cellval < 10):
         await member.add_roles(role0)
-        await interaction.response.send_message(f'You have been assigned the 0+ games role as you have not yet attended enough to increase', ephemeral=True)
+        await interaction.response.send_message(f'You have been assigned the 0+ games role as you have not yet attended enough to increase you currently have {cellval} games played.', ephemeral=True)
+    elif(cellval < 20):
+        await member.add_roles(role10)
+        await member.remove_roles(role0)
+        await interaction.response.send_message(f'You have been assigned the 10+ games role as you have attended enough to increase you currently have {cellval} games played.', ephemeral=True)
     elif(cellval < 40):
         await member.add_roles(role20)
-        await member.remove_roles(role0)
-        await interaction.response.send_message(f'You have been assigned the 20+ games role as you have attended enough to increase', ephemeral=True)
+        await member.remove_roles(role10)
+        await interaction.response.send_message(f'You have been assigned the 20+ games role as you have attended enough to increase you currently have {cellval} games played.', ephemeral=True)
     elif(cellval < 60):
         await member.add_roles(role40)
         await member.remove_roles(role20)
-        await interaction.response.send_message(f'You have been assigned the 40+ games role as you have attended enough to increase', ephemeral=True)
+        await interaction.response.send_message(f'You have been assigned the 40+ games role as you have attended enough to increase you currently have {cellval} games played. ', ephemeral=True)
     elif(cellval < 80):
         await member.add_roles(role60)
         await member.remove_roles(role40)
-        await interaction.response.send_message(f'You have been assigned the 60+ games role as you have attended enough to increase', ephemeral=True)
+        await interaction.response.send_message(f'You have been assigned the 60+ games role as you have attended enough to increase you currently have {cellval} games played.', ephemeral=True)
     elif(cellval < 100):
         await member.add_roles(role80)
         await member.remove_roles(role60)
-        await interaction.response.send_message(f'You have been assigned the 80+ games role as you have attended enough to increase', ephemeral=True)
+        await interaction.response.send_message(f'You have been assigned the 80+ games role as you have attended enough to increase you currently have {cellval} games played.', ephemeral=True)
     else:
         await member.add_roles(role100)
         await member.remove_roles(role80)
-        await interaction.response.send_message(f'You have been assigned the 100+ games role as you have attended enough to increase', ephemeral=True)
+        await interaction.response.send_message(f'You have been assigned the 100+ games role as you have attended enough to increase you currently have {cellval} games played.', ephemeral=True)
         
 @bot.tree.command(name="highest_role_winrate", description="highest winrate for each role")
 @app_commands.describe(role = 'Role you would like to check (Townsfolk for Townsfolk total and Total Good for all good)')
@@ -207,6 +212,58 @@ async def highest_role_winrate(interaction : discord.Interaction, role : str):
     else:
         await interaction.response.send_message(f'{name[0]} has the highest winrate as the/a {role} which is {data[0]}%')
     
+@commands.is_owner()  # Prevent other people from using the command
+@bot.tree.command(name="update_user_role", description="Update the role for a given user")
+@app_commands.describe(user="The user whose role you want to update")
+async def update_user_role(interaction: discord.Interaction, user: discord.Member):
+    try:
+        # Retrieve the column for the user
+        column = Switches.get_player_from_discord(user.name)
+        column = Helper.increment_col(column)
+        column = Helper.increment_col(column)
+        cell = column + str(Getters.get_total_played())
+        cellval = Helper.sheet[cell].value
 
+        # Define roles based on the algorithm in update_role
+        server = interaction.guild
+        role0 = server.get_role(1294069983151919134)
+        role10 = server.get_role(1451683827897597973)
+        role20 = server.get_role(1294281073043177535)
+        role40 = server.get_role(1294068836764614788)
+        role60 = server.get_role(1294069566409801760)
+        role80 = server.get_role(1294068801448574996)
+        role100 = server.get_role(1294068667801276426)
+
+        # Assign roles based on the total games played
+        if cellval < 10:
+            await user.add_roles(role0)
+            await interaction.response.send_message(f"{user.mention} has been assigned the 0+ games role. they have {cellval} games played.", ephemeral=True)
+        elif cellval < 20:
+            await user.add_roles(role10)
+            await user.remove_roles(role0)
+            await interaction.response.send_message(f"{user.mention} has been assigned the 10+ games role. they have {cellval} games played.", ephemeral=True)
+        elif cellval < 40:
+            await user.add_roles(role20)
+            await user.remove_roles(role10)
+            await interaction.response.send_message(f"{user.mention} has been assigned the 20+ games role. they have {cellval} games played.", ephemeral=True)
+        elif cellval < 60:
+            await user.add_roles(role40)
+            await user.remove_roles(role20)
+            await interaction.response.send_message(f"{user.mention} has been assigned the 40+ games role. they have {cellval} games played.", ephemeral=True)
+        elif cellval < 80:
+            await user.add_roles(role60)
+            await user.remove_roles(role40)
+            await interaction.response.send_message(f"{user.mention} has been assigned the 60+ games role. they have {cellval} games played.", ephemeral=True)
+        elif cellval < 100:
+            await user.add_roles(role80)
+            await user.remove_roles(role60)
+            await interaction.response.send_message(f"{user.mention} has been assigned the 80+ games role. they have {cellval} games played.", ephemeral=True)
+        else:
+            await user.add_roles(role100)
+            await user.remove_roles(role80)
+            await interaction.response.send_message(f"{user.mention} has been assigned the 100+ games role. they have {cellval} games played.", ephemeral=True)
+    except Exception as e:
+        # Handle any errors that occur
+        await interaction.response.send_message(f"Failed to update role: {str(e)}", ephemeral=True)
 
 bot.run(token)
