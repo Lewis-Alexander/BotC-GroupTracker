@@ -24,4 +24,8 @@ def total_percentage_column() -> str:
 def get_starting_player_percentage_column() -> str:
     return 'K'
 def get_playercount() -> int:
-    return 33
+    return 36
+def get_matchup_row_start() -> int:
+    return 171
+def get_matchup_gap() -> int:
+    return 11

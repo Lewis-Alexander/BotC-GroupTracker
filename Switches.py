@@ -68,6 +68,10 @@ def get_player_from_discord(name: str) -> str:
             return "FC"
         case "aero1908":
             return "FH"
+        case "mrshuvaluva":
+            return "FM"
+        case "rashorras":
+            return "FR"
         case _: #Error if not found player
             return "ERROR"
 
@@ -142,8 +146,89 @@ def find_player(player: str) -> chr:
             return "FC"
         case "aaron":
             return "FH"
-        case "nonplayer":
+        case "gary":
+            return "FM"
+        case "ross":
             return "FR"
+        case "nonplayer":
+            return "GB"
+        case _: #Error if not found player
+            return "ERROR"
+        
+def find_player_matchup(player: str) -> chr:
+    match player:
+        case "oliver":
+            return 171
+        case "sophie":
+            return 182
+        case "ethan":
+            return 193
+        case "richard":
+            return 204
+        case "dan":
+            return 215
+        case "callum":
+            return 226
+        case "ryan":
+            return 237
+        case "stuart":
+            return 248
+        case "ant":
+            return 259
+        case "antknee":
+            return 259
+        case "ronnie":
+            return 270
+        case "ian":
+            return 281
+        case "reuben":
+            return 292
+        case "findlay":
+            return 303
+        case "daniel":
+            return 314
+        case "emily":
+            return 325
+        case "laurence":
+            return 336
+        case "benn":
+            return 347
+        case "bens":
+            return 358
+        case "andy":
+            return 369
+        case "ben3":
+            return 380
+        case "carrick":
+            return 391
+        case "connor":
+            return 402
+        case "drystan":
+            return 413
+        case "heather":
+            return 424
+        case "etienne":
+            return 435
+        case "liv":
+            return 446
+        case "rory":
+            return 457
+        case "scott":
+            return 468
+        case "tj":
+            return 479
+        case "lochlann":
+            return 490
+        case "colin":
+            return 501
+        case "aaron":
+            return 512
+        case "gary":
+            return 523
+        case "ross":
+            return 534
+        case "nonplayer":
+            return 556
         case _: #Error if not found player
             return "ERROR"
         
@@ -455,3 +540,13 @@ def find_role(Role: str) -> int:
         #Error case if not found
         case _:
             return 0
+        
+def find_role_matchup(Row: int) -> int:
+    if(Row <= Getters.get_outsider()): #townsfolk or outsider
+        return 1
+    elif(Row <= Getters.get_minion()): #minion
+        return 2
+    elif(Row <= Getters.get_demon()): #demon
+        return 3
+    else: #error
+        return "ERROR"

@@ -124,7 +124,16 @@ async def update_spreadsheet(interaction: discord.Interaction):
     if my_file.is_file():
         data = Helper.separate_file()
         Helper.update_stats(data)
-        await interaction.response.send_message(f'spreadsheet updated', ephemeral=True)   
+        await interaction.response.send_message(f'spreadsheet updated', ephemeral=True)
+        
+@commands.is_owner()  # Prevent other people from using the command
+@bot.tree.command(name="update_matchups", description="if program has a csv file it uses it to update the spreadsheet")
+async def update_matchups(interaction: discord.Interaction):
+    my_file = Path("Results.csv")
+    if my_file.is_file():
+        data = Helper.separate_file()
+        Helper.update_matchups(data)
+        await interaction.response.send_message(f'matchups updated', ephemeral=True)      
 
 @bot.tree.command(name="update_role", description="auto update personal role from database")
 async def update_role(interaction : discord.Interaction):
