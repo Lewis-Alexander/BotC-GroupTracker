@@ -52,9 +52,12 @@ def update_evil_stat(column: int, row: int, good_win: int) -> None:
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
     
 def update_player_matchup(column: int, row: int, col_player: int, row_player: int,won: int) -> None:
+    #print(f'updating matchup for col player {col_player} and row player {row_player} with won value {won}')
+    #print(f'initial column {column} and row {row}')
     if((col_player == 1 and (row_player == 2 or row_player == 3)) or ((col_player == 2 or col_player == 3) and row_player == 1)): #on different teams
+        #print('different teams, no update')
         return
-    if(won[0] == '0'): #since player has not won increment lost instead of win
+    if((won[0] == '0' and col_player == 1) or (won[0] == '1' and (col_player == 2 or col_player == 3))): #since player has not won increment lost instead of win
         column = increment_col(column)
     gap = 0
     evil = 0 #to change total evil matchups aswell
@@ -74,13 +77,17 @@ def update_player_matchup(column: int, row: int, col_player: int, row_player: in
     value = sheet[cell].value
     value += 1
     sheet[cell].value = value
+    #print(f'updating cell {cell} to value {value}')
     workbook.save()
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
+    if(evil == 0): # was on good team so no evil matchup to update
+        return
     row = row + evil
     cell = str(column) + str(row)
     value = sheet[cell].value
     value += 1
     sheet[cell].value = value
+    #print(f'updating evil matchup cell {cell} to value {value}')
     workbook.save()
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
 
@@ -108,8 +115,8 @@ def update_stats(Data: array) -> None:
         else:
             update_good_stat(column[i],row[i],good_win)
         for entry in matchup_row:
-            if(matchup_row[i] != "ERROR" and matchup_role[i] != "ERROR" and i != j):
-                update_player_matchup(column[i], matchup_row[j], matchup_role[i],matchup_role[i], good_win)
+            if(i != j):
+                update_player_matchup(column[i], matchup_row[j], matchup_role[i], matchup_role[j], good_win)
             j += 1
         
         i += 1
@@ -135,7 +142,7 @@ def update_matchups(Data: array) -> None:
         j = 0
         for entry in matchup_row:
             if(matchup_row[i] != "ERROR" and matchup_role[i] != "ERROR" and i != j):
-                update_player_matchup(column[i], matchup_row[j], matchup_role[i],matchup_role[i], good_win)
+                update_player_matchup(column[i], matchup_row[j], matchup_role[i],matchup_role[j], good_win)
             j += 1
         i += 1
             
@@ -151,8 +158,7 @@ def replace_player_array_matchup(Player: array) ->array:
 def replace_role_array_matchup(Role: array) ->array:
     FixedRole = []
     for entry in Role:
-        role = entry[0]
-        role = role.lower()
+        role = entry
         FixedRole.append(Switches.find_role_matchup(role))
     return FixedRole
 
