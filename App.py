@@ -277,4 +277,82 @@ async def update_user_role(interaction: discord.Interaction, user: discord.Membe
         # Handle any errors that occur
         await interaction.response.send_message(f"Failed to update role: {str(e)}", ephemeral=True)
 
+@bot.tree.command(name="player_to_player_matchup_evil", description="Check two players matchup stats when on the evil team together first is the reference player")
+@app_commands.describe(player1 = 'Player you would like to check (same name as on spreadsheet)')
+@app_commands.describe(player2 = 'Player you would like to check (same name as on spreadsheet)')
+async def player_to_player_matchup_evil(interaction: discord.Interaction, player1: str, player2: str):
+    column = Switches.find_player(player1.lower())
+    row = Switches.find_player_matchup(player2.lower())
+    if(column == "ERROR" or row == "ERROR"):
+        await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
+    else:
+        column = Helper.increment_col(column)
+        column = Helper.increment_col(column)
+        row = row + 1 #start with minion info
+        cell = str(column)+str(row)
+        data = []
+        for i in range(4):       
+                cell = str(column)+str(row)
+                data.append(Helper.sheet[cell].value)
+                row = row + 1
+        await interaction.response.send_message(f'when {player1} and {player2} are both minions their winrate is {data[0]}, if the second player is the demon or they both are demons their winrate is {data[1]}, if the first player is the demon and the second is one of the minions their winrate is {data[2]}, this means their average winrate as an evil team is {data[3]}.')
+        
+@bot.tree.command(name="player_to_player_matchup_good", description="Check two players matchup stats when on the good team together first is the reference player")
+@app_commands.describe(player1 = 'Reference Player you would like to check (same name as on spreadsheet)')
+@app_commands.describe(player2 = 'Secondary Player you would like to check (same name as on spreadsheet)')
+async def player_to_player_matchup_good(interaction: discord.Interaction, player1: str, player2: str):
+    column = Switches.find_player(player1.lower())
+    row = Switches.find_player_matchup(player2.lower())
+    if(column == "ERROR" or row == "ERROR"):
+        await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
+    else:
+        column = Helper.increment_col(column)
+        column = Helper.increment_col(column)
+        row = row + 5 #start with correct info
+        cell = str(column)+str(row)    
+        data = Helper.sheet[cell].value
+        row = row + 1
+        await interaction.response.send_message(f'when {player1} and {player2} are both on the good team their winrate is {data}.')
+        
+@bot.tree.command(name="player_to_player_matchup_total", description="Check two players matchup stats when on the same team, first is the reference player")
+@app_commands.describe(player1 = 'Reference Player you would like to check (same name as on spreadsheet)')
+@app_commands.describe(player2 = 'Secondary Player you would like to check (same name as on spreadsheet)')
+async def player_to_player_matchup_total(interaction: discord.Interaction, player1: str, player2: str):
+    column = Switches.find_player(player1.lower())
+    print(f'columnPlayer: {column}')
+    row = Switches.find_player_matchup(player2.lower())
+    if(column == "ERROR" or row == "ERROR"):
+        await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
+    else:
+        column = Helper.increment_col(column)
+        column = Helper.increment_col(column)
+        print(f'column after increments: {column}')
+        row = row + 6 #start with correct info
+        cell = str(column)+str(row)    
+        data = Helper.sheet[cell].value
+        row = row + 1
+        await interaction.response.send_message(f'when {player1} and {player2} are both on the same team their winrate is {data}.')
+        
+
+@bot.tree.command(name="player_to_player_winrate_delta", description="Check two players winrate delta when playing together, first is the reference player")
+@app_commands.describe(player1 = 'Reference Player you would like to check (same name as on spreadsheet)')
+@app_commands.describe(player2 = 'Secondary Player you would like to check (same name as on spreadsheet)')
+async def player_to_player_winrate_delta(interaction: discord.Interaction, player1: str, player2: str):
+    column = Switches.find_player(player1.lower())
+    row = Switches.find_player_matchup(player2.lower())
+    if(column == "ERROR" or row == "ERROR"):
+        await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
+    else:
+        column = Helper.increment_col(column)
+        column = Helper.increment_col(column)
+        row = row + 7 #start with correct info
+        cell = str(column)+str(row)
+        data = []
+        for i in range(3):       
+                cell = str(column)+str(row)
+                data.append(Helper.sheet[cell].value)
+                row = row + 1
+        await interaction.response.send_message(f'when {player1} and {player2} are on the evil team together the first players default evil winrate changes by {data[0]}, if they are together on the good team their winrate changes by {data[1]}, on average if both players are on the same team the first players winrate delta is {data[2]}%.')
+
+
 bot.run(token)
