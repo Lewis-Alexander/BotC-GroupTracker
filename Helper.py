@@ -66,13 +66,13 @@ def update_player_matchup(column: int, row: int, col_player: int, row_player: in
     elif(col_player == 2 and row_player == 2): # both minion
         gap = 1
         evil = 4 - gap
-    elif(col_player == 2 and row_player == 3): # col player is minion and row player is demon
+    elif((col_player == 2 and row_player == 3) or (col_player == 3 and row_player == 3)): # col player is minion and row player is demon or both demon
         gap = 2
         evil = 4 - gap
     elif(col_player == 3 and row_player == 2): # col player is demon and row player is minion
         gap = 3
         evil = 4 - gap
-    row = row + gap
+    row = int(row) + int(gap)
     cell = str(column) + str(row)
     value = sheet[cell].value
     value += 1
@@ -82,7 +82,7 @@ def update_player_matchup(column: int, row: int, col_player: int, row_player: in
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
     if(evil == 0): # was on good team so no evil matchup to update
         return
-    row = row + evil
+    row = int(row) + int(evil)
     cell = str(column) + str(row)
     value = sheet[cell].value
     value += 1
