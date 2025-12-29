@@ -1,7 +1,7 @@
 import array
-import Switches
 import csv
 import xlwings as xw
+from Spreadsheetclass import spreadsheetValues
 
 workbook = xw.Book('BotC-Stats.xlsx')
 sheet = workbook.sheets['Sheet1']
@@ -19,7 +19,7 @@ def replace_player_array(Player: array) ->array:
     for entry in Player:
         player = entry[0]
         player = player.lower()
-        FixedPlayer.append(Switches.find_player(player))
+        FixedPlayer.append(find_player(player))
     return FixedPlayer
 
 def replace_role_array(Role: array) ->array:
@@ -27,7 +27,7 @@ def replace_role_array(Role: array) ->array:
     for entry in Role:
         role = entry[0]
         role = role.lower()
-        FixedRole.append(Switches.find_role(role))
+        FixedRole.append(find_role(role))
     return FixedRole
 
 def update_good_stat(column: int, row: int, good_win: int) -> None:
@@ -152,14 +152,14 @@ def replace_player_array_matchup(Player: array) ->array:
     for entry in Player:
         player = entry[0]
         player = player.lower()
-        FixedPlayer.append(Switches.find_player_matchup(player))
+        FixedPlayer.append(find_player_matchup(player))
     return FixedPlayer
 
 def replace_role_array_matchup(Role: array) ->array:
     FixedRole = []
     for entry in Role:
         role = entry
-        FixedRole.append(Switches.find_role_matchup(role))
+        FixedRole.append(find_role_matchup(role))
     return FixedRole
 
 def increment_col(string: str):
@@ -198,3 +198,113 @@ def decrement_char(char: chr):
             return 'ERROR'
         else:
             return chr(ord(char) - 1)
+        
+def setup_class():
+    column = 'A'
+    row = 1
+    while(True):
+        cell = str(column) + str(row)
+        value = sheet[cell].value
+        match value:
+            case 'end':
+                break
+            case None:
+                pass
+            case _ if value not in ['Players', 'Total', 'Template']:
+                spreadsheetValues.player_list.append(value.lower())
+                spreadsheetValues.player_col_list.append(column)
+        column = increment_col(column) 
+    spreadsheetValues.playercount = len(spreadsheetValues.player_list)
+    
+    column = 'A'
+    while(True):
+        cell = str(column) + str(row)
+        value = sheet[cell].value
+        match value:
+            case 'roleend':
+                row += 1
+                break
+            case None:
+                pass
+            case 'Townsfolk Total':
+                spreadsheetValues.townsfolk = row
+            case 'Outsider Total':
+                spreadsheetValues.outsider = row
+            case 'Minion Total':
+                spreadsheetValues.minion = row
+            case 'Demon Total':
+                spreadsheetValues.demon = row
+            case 'Good Averages':
+                spreadsheetValues.average_good = row
+            case 'Evil Averages':
+                spreadsheetValues.average_evil = row
+            case 'Total Averages':
+                spreadsheetValues.average_total = row
+            case 'Total Played':
+                spreadsheetValues.total_played = row
+            case _ if value not in ['Townsfolk Roles', 'Outsider Roles', 'Minion Roles', 'Demon Roles']:
+                spreadsheetValues.role_list.append(value.lower())
+                spreadsheetValues.role_list_idx.append(row)
+        row += 1
+    spreadsheetValues.rolecount = len(spreadsheetValues.role_list)
+    
+    spreadsheetValues.matchup_row_start = row
+    while(True):
+        cell = str(column) + str(row)
+        value = sheet[cell].value
+        match value:
+            case None:
+                pass
+            case _ if value.lower() == spreadsheetValues.player_list[1]: #since the gap between players is constant just need to find first
+                break
+        row += 1
+    spreadsheetValues.matchup_gap = row - spreadsheetValues.matchup_row_start   
+
+
+def find_role(rolein: str) -> str:
+    match rolein.lower():
+        case "townsfolk":
+            return spreadsheetValues.townsfolk
+        case "outsider":
+            return spreadsheetValues.outsider
+        case "minion":
+            return spreadsheetValues.minion
+        case "demon":
+            return spreadsheetValues.demon
+        case "total good":
+            return spreadsheetValues.average_good
+        case "total evil":
+            return spreadsheetValues.average_evil
+        case "total":
+            return spreadsheetValues.average_total
+        case _:
+            for role in spreadsheetValues.role_list:
+                if(role.lower() == rolein.lower()):
+                    index = spreadsheetValues.role_list.index(role)
+                    return spreadsheetValues.role_list_idx[index]
+    return "ERROR"
+        
+def find_player(playerin: str) -> str:
+    for player in spreadsheetValues.player_list:
+        if(player.lower() == playerin.lower()):
+            index = spreadsheetValues.player_list.index(player)
+            return spreadsheetValues.player_col_list[index]
+    return "ERROR"
+
+def find_player_matchup(name: str) -> str:
+    for player in spreadsheetValues.player_list:
+        if(player.lower() == name):
+            index = spreadsheetValues.player_list.index(player)
+            return spreadsheetValues.matchup_row_start + (index * spreadsheetValues.matchup_gap)
+    return "ERROR"
+
+
+def find_role_matchup(Row: int) -> int:
+    if(Row <= spreadsheetValues.outsider): #townsfolk or outsider
+        return 1
+    elif(Row <= spreadsheetValues.minion): #minion
+        return 2
+    elif(Row <= spreadsheetValues.demon): #demon
+        return 3
+    else: #error
+        return "ERROR"
