@@ -17,6 +17,7 @@ class spreadsheetValuesClass:
         self._matchup_row_start = 171
         self._matchup_gap = 11
         self._player_list = []
+        self._username_list = []
         self._player_col_list = []
         self._role_list = []
         self._role_list_idx = []
@@ -157,6 +158,14 @@ class spreadsheetValuesClass:
     @player_list.setter
     def player_list(self, value):
         self._player_list = value
+    
+    @property
+    def username_list(self):
+        return self._username_list
+    
+    @username_list.setter
+    def username_list(self, value):
+        self._username_list = value
         
     @property
     def player_col_list(self):

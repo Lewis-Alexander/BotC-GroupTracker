@@ -1,5 +1,4 @@
 import discord
-import Switches
 import Helper
 from Token import token
 from discord import app_commands
@@ -31,7 +30,8 @@ async def sync(ctx: commands.Context) -> None:
 
 @bot.tree.command(name="personal_average", description="Check your average winrates for sides")
 async def personal_average(interaction: discord.Interaction):
-    column = Switches.get_player_from_discord(interaction.user.name)
+    column = Helper.find_player_username(interaction.user.name)
+    print(f'column: {column}')
     column = Helper.increment_col(column)
     column = Helper.increment_col(column)
     cell = str(column)+str(spreadsheetValues.average_good)
@@ -49,7 +49,7 @@ async def personal_average(interaction: discord.Interaction):
 @bot.tree.command(name="personal_role_stats", description="Check any your stats for a particular role")
 @app_commands.describe(role = 'Role you would like to check (Townsfolk for Townsfolk total and Total Good for all good)')
 async def personal_role_stats(interaction: discord.Interaction, role: str):
-    column = Switches.get_player_from_discord(interaction.user.name)
+    column = Helper.find_player_username(interaction.user.name)
     column = Helper.decrement_col(column)
     row = Helper.find_role(role.lower())
     if(row == 0):
@@ -149,7 +149,7 @@ async def update_role(interaction : discord.Interaction):
     role80 = server.get_role(1294068801448574996)
     role100 = server.get_role(1294068667801276426)
     member = interaction.user
-    column = Switches.get_player_from_discord(member.name)
+    column = Helper.find_player_username(member.name)
     column = Helper.increment_col(column)
     column = Helper.increment_col(column)
     cell = column + str(spreadsheetValues.total_played)
@@ -230,7 +230,7 @@ async def highest_role_winrate(interaction : discord.Interaction, role : str):
 async def update_user_role(interaction: discord.Interaction, user: discord.Member):
     try:
         # Retrieve the column for the user
-        column = Switches.get_player_from_discord(user.name)
+        column = Helper.find_player_username(user.name)
         column = Helper.increment_col(column)
         column = Helper.increment_col(column)
         cell = column + str(spreadsheetValues.total_played)

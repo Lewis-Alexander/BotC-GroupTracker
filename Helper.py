@@ -213,6 +213,13 @@ def setup_class():
             case _ if value not in ['Players', 'Total', 'Template']:
                 spreadsheetValues.player_list.append(value.lower())
                 spreadsheetValues.player_col_list.append(column)
+                row += 1
+                cell = str(column) + str(row)
+                value = sheet[cell].value
+                if(value is not None):
+                    spreadsheetValues.username_list.append(value.lower())
+                row -= 1
+                
         column = increment_col(column) 
     spreadsheetValues.playercount = len(spreadsheetValues.player_list)
     
@@ -288,6 +295,14 @@ def find_player(playerin: str) -> str:
     for player in spreadsheetValues.player_list:
         if(player.lower() == playerin.lower()):
             index = spreadsheetValues.player_list.index(player)
+            return spreadsheetValues.player_col_list[index]
+    return "ERROR"
+
+def find_player_username(name: str) -> str:
+    print(name)
+    for player in spreadsheetValues.username_list:
+        if(player.lower() == name):
+            index = spreadsheetValues.username_list.index(player)
             return spreadsheetValues.player_col_list[index]
     return "ERROR"
 
