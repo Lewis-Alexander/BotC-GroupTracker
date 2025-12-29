@@ -52,10 +52,7 @@ def update_evil_stat(column: int, row: int, good_win: int) -> None:
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
     
 def update_player_matchup(column: int, row: int, col_player: int, row_player: int,won: int) -> None:
-    #print(f'updating matchup for col player {col_player} and row player {row_player} with won value {won}')
-    #print(f'initial column {column} and row {row}')
     if((col_player == 1 and (row_player == 2 or row_player == 3)) or ((col_player == 2 or col_player == 3) and row_player == 1)): #on different teams
-        #print('different teams, no update')
         return
     if((won[0] == '0' and col_player == 1) or (won[0] == '1' and (col_player == 2 or col_player == 3))): #since player has not won increment lost instead of win
         column = increment_col(column)
@@ -77,7 +74,6 @@ def update_player_matchup(column: int, row: int, col_player: int, row_player: in
     value = sheet[cell].value
     value += 1
     sheet[cell].value = value
-    #print(f'updating cell {cell} to value {value}')
     workbook.save()
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
     if(evil == 0): # was on good team so no evil matchup to update
@@ -87,7 +83,6 @@ def update_player_matchup(column: int, row: int, col_player: int, row_player: in
     value = sheet[cell].value
     value += 1
     sheet[cell].value = value
-    #print(f'updating evil matchup cell {cell} to value {value}')
     workbook.save()
     workbook.save(r'C:\Users\rainb\Documents\code\BotC-GroupTracker\BotC-Stats.xlsx')
 
@@ -299,7 +294,6 @@ def find_player(playerin: str) -> str:
     return "ERROR"
 
 def find_player_username(name: str) -> str:
-    print(name)
     for player in spreadsheetValues.username_list:
         if(player.lower() == name):
             index = spreadsheetValues.username_list.index(player)

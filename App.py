@@ -31,7 +31,6 @@ async def sync(ctx: commands.Context) -> None:
 @bot.tree.command(name="personal_average", description="Check your average winrates for sides")
 async def personal_average(interaction: discord.Interaction):
     column = Helper.find_player_username(interaction.user.name)
-    print(f'column: {column}')
     column = Helper.increment_col(column)
     column = Helper.increment_col(column)
     cell = str(column)+str(spreadsheetValues.average_good)
@@ -320,14 +319,12 @@ async def player_to_player_matchup_good(interaction: discord.Interaction, player
 @app_commands.describe(player2 = 'Secondary Player you would like to check (same name as on spreadsheet)')
 async def player_to_player_matchup_total(interaction: discord.Interaction, player1: str, player2: str):
     column = Helper.find_player(player1.lower())
-    print(f'columnPlayer: {column}')
     row = Helper.find_player_matchup(player2.lower())
     if(column == "ERROR" or row == "ERROR"):
         await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
     else:
         column = Helper.increment_col(column)
         column = Helper.increment_col(column)
-        print(f'column after increments: {column}')
         row = row + 6 #start with correct info
         cell = str(column)+str(row)    
         data = Helper.sheet[cell].value
