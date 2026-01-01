@@ -1,14 +1,15 @@
 import discord
 import Helper
+import Pairwise
+import random
 from Token import token
 from discord import app_commands
+from discord.ui import View, Button
 from discord.ext import commands
 from pathlib import Path
 from Spreadsheetclass import spreadsheetValues
 
-#------bot stuff--------
 bot = commands.Bot(command_prefix='!', intents = discord.Intents.all())
-client = discord.Client(intents=discord.Intents.all())
 
 @bot.event
 async def on_ready():
@@ -353,9 +354,112 @@ async def player_to_player_winrate_delta(interaction: discord.Interaction, playe
         data[2] = data[2]*100
         await interaction.response.send_message(f'when {player1} and {player2} are on the evil team together the first players default evil winrate changes by {data[0]} (absolute), if they are together on the good team their winrate changes by {data[1]} (absolute), on average if both players are on the same team the first players average winrate delta is an absolute value of {data[2]}%.')
 
+@bot.tree.command(name="role_fun_comparison", description="Randomly select two roles and ask which is more fun to play")
+async def role_fun_comparison(interaction: discord.Interaction):
+    async def send_new_comparison(interaction: discord.Interaction, is_initial: bool = False):
+        role1, role2 = random.sample(spreadsheetValues.role_list, 2)
+
+        async def button_callback(interaction: discord.Interaction, selected_role: str):
+            Pairwise.save_pairwise_comparison(role1, role2, selected_role, category="fun")
+            await send_new_comparison(interaction)
+
+        async def skip_callback(interaction: discord.Interaction):
+            await send_new_comparison(interaction)
+
+        button1 = Button(label=role1, style=discord.ButtonStyle.primary)
+        button2 = Button(label=role2, style=discord.ButtonStyle.primary)
+        skip_button = Button(label="Do Not Know", style=discord.ButtonStyle.secondary)
+
+        button1.callback = lambda i: button_callback(i, role1)
+        button2.callback = lambda i: button_callback(i, role2)
+        skip_button.callback = skip_callback
+
+        view = View()
+        view.add_item(button1)
+        view.add_item(button2)
+        view.add_item(skip_button)
+
+        # Send or edit the message based on whether it's the initial interaction
+        if is_initial:
+            await interaction.response.send_message(
+                content="Which role is more fun to play?", view=view, ephemeral=True
+            )
+        else:
+            await interaction.response.edit_message(
+                content="Which role is more fun to play?", view=view
+            )
+    await send_new_comparison(interaction, is_initial=True)
+
+@bot.tree.command(name="role_fun_ranking", description="Display a ranking of roles based on pairwise comparisons")
+async def role_fun_ranking(interaction: discord.Interaction):
+    ranked_roles = Pairwise.generate_role_ranking(category="fun")
+    if not ranked_roles:
+        await interaction.response.send_message("No ranking data available.", ephemeral=True)
+        return
+
+    ranking_message = "\n".join(
+        [f"{i + 1}. {role} (Score: {score})" for i, (role, score) in enumerate(ranked_roles)]
+    )
+    
+    await interaction.response.send_message(
+        f"Role Ranking:\n{ranking_message}", ephemeral=True
+    )
+    
+@bot.tree.command(name="role_strength_comparison", description="Randomly select two roles and ask which is in your view stronger")
+async def role_strength_comparison(interaction: discord.Interaction):
+    async def send_new_comparison(interaction: discord.Interaction, is_initial: bool = False):
+        role1, role2 = random.sample(spreadsheetValues.role_list, 2)
+
+        async def button_callback(interaction: discord.Interaction, selected_role: str):
+            Pairwise.save_pairwise_comparison(role1, role2, selected_role, category="strength")
+            await send_new_comparison(interaction)
+
+        async def skip_callback(interaction: discord.Interaction):
+            await send_new_comparison(interaction)
+
+        button1 = Button(label=role1, style=discord.ButtonStyle.primary)
+        button2 = Button(label=role2, style=discord.ButtonStyle.primary)
+        skip_button = Button(label="Do Not Know", style=discord.ButtonStyle.secondary)
+
+        button1.callback = lambda i: button_callback(i, role1)
+        button2.callback = lambda i: button_callback(i, role2)
+        skip_button.callback = skip_callback
+
+        view = View()
+        view.add_item(button1)
+        view.add_item(button2)
+        view.add_item(skip_button)
+
+        if is_initial:
+            await interaction.response.send_message(
+                content="Which role is stronger?", view=view, ephemeral=True
+            )
+        else:
+            await interaction.response.edit_message(
+                content="Which role is stronger?", view=view
+            )
+    await send_new_comparison(interaction, is_initial=True)
+
+@bot.tree.command(name="role_strength_ranking", description="Display a ranking of roles based on pairwise comparisons")
+async def role_strength_ranking(interaction: discord.Interaction):
+    ranked_roles = Pairwise.generate_role_ranking(category="strength")
+    
+    if not ranked_roles:
+        await interaction.response.send_message("No ranking data available.", ephemeral=True)
+        return
+    
+    ranking_message = "\n".join(
+        [f"{i + 1}. {role} (Score: {score})" for i, (role, score) in enumerate(ranked_roles)]
+    )
+    
+    await interaction.response.send_message(
+        f"Role Ranking:\n{ranking_message}", ephemeral=True
+    )
+
 @bot.event
 async def on_ready():
     Helper.setup_class()
-    #await bot.get_channel(1302801362517622874).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {spreadsheetValues.playercount} players and {spreadsheetValues.rolecount} roles.")
+    await bot.get_channel(1302801362517622874).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
+    
 
 bot.run(token)
