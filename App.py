@@ -60,7 +60,7 @@ async def personal_role_stats(interaction: discord.Interaction, role: str):
             cell = str(column)+str(row)
             data.append(Helper.sheet[cell].value)
             column = Helper.increment_col(column)
-        await interaction.response.send_message(f'you have played the {role} {data[0]} times, of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.')
+        await interaction.response.send_message(f'you have played the {role.capitalize()} {data[0]} times, of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.')
 
 @bot.tree.command(name="player_average", description="Check any players average winrates")
 @app_commands.describe(player = 'Player you would like to see the averages for')
@@ -76,7 +76,7 @@ async def player_average(interaction: discord.Interaction, player: str):
         for i in range(3):       
             cell = str(column)+str(rows[i])
             data.append(Helper.sheet[cell].value)
-        await interaction.response.send_message(f'{player}\'s average winrates are as follows: Good-{data[0]} Evil-{data[1]} Total-{data[2]}')
+        await interaction.response.send_message(f'{player.capitalize()}\'s average winrates are as follows: Good-{data[0]} Evil-{data[1]} Total-{data[2]}')
 
 
 @bot.tree.command(name="role_total_stats", description="Check the stats for a particular role")
@@ -92,7 +92,7 @@ async def role_total_stats(interaction: discord.Interaction, role: str):
                 cell = str(column)+str(row)
                 data.append(Helper.sheet[cell].value)
                 column = Helper.increment_col(column)
-        await interaction.response.send_message(f'The {role} has been played {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.')
+        await interaction.response.send_message(f'The {role.capitalize()} has been played {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.')
 
 @bot.tree.command(name='player_role_stats', description="Check any players stats for a particular role")
 @app_commands.describe(role = 'Role you would like to check, (Townsfolk for Townsfolk total and Total Good for all good)')
@@ -110,7 +110,7 @@ async def player_role_stats(interaction: discord.Interaction, role: str, player:
                 cell = str(column)+str(row)
                 data.append(Helper.sheet[cell].value)
                 column = Helper.increment_col(column)
-        await interaction.response.send_message(f'{player} has played {role} {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)   
+        await interaction.response.send_message(f'{player.capitalize()} has played {role.capitalize()} {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)   
     
         
 
@@ -214,7 +214,7 @@ async def highest_role_winrate(interaction : discord.Interaction, role : str):
         cell = str(column) + str(1)
         name.append(Helper.sheet[cell].value)
     if(len(name) > 1):
-        players = f'Multiple players have a tied winrate of {data[0]}% on the {role} those being '
+        players = f'Multiple players have a tied winrate of {data[0]}% on the {role.capitalize()} those being '
         for entry in name:
             if(entry != name[-1]):
                 players += f'{entry}, '
@@ -222,7 +222,7 @@ async def highest_role_winrate(interaction : discord.Interaction, role : str):
                 players += f'and {entry}.'
         await interaction.response.send_message(f'{players}')
     else:
-        await interaction.response.send_message(f'{name[0]} has the highest winrate as the/a {role} which is {data[0]}%')
+        await interaction.response.send_message(f'{name[0].capitalize()} has the highest winrate as the/a {role.capitalize()} which is {data[0]}%')
     
 @commands.is_owner()  # Prevent other people from using the command
 @bot.tree.command(name="update_user_role", description="Update the role for a given user")
@@ -296,7 +296,7 @@ async def player_to_player_matchup_evil(interaction: discord.Interaction, player
                 cell = str(column)+str(row)
                 data.append(Helper.sheet[cell].value)
                 row = row + 1
-        await interaction.response.send_message(f'when {player1} and {player2} are both minions their winrate is {data[0]}, if the second player is the demon or they both are demons their winrate is {data[1]}, if the first player is the demon and the second is one of the minions their winrate is {data[2]}, this means their average winrate as an evil team is {data[3]}.')
+        await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are both minions their winrate is {data[0]}, if the second player is the demon or they both are demons their winrate is {data[1]}, if the first player is the demon and the second is one of the minions their winrate is {data[2]}, this means their average winrate as an evil team is {data[3]}.')
         
 @bot.tree.command(name="player_to_player_matchup_good", description="Check two players matchup stats when on the good team together first is the reference player")
 @app_commands.describe(player1 = 'Reference Player you would like to check (same name as on spreadsheet)')
@@ -313,7 +313,7 @@ async def player_to_player_matchup_good(interaction: discord.Interaction, player
         cell = str(column)+str(row)    
         data = Helper.sheet[cell].value
         row = row + 1
-        await interaction.response.send_message(f'when {player1} and {player2} are both on the good team their winrate is {data}.')
+        await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are both on the good team their winrate is {data}.')
         
 @bot.tree.command(name="player_to_player_matchup_total", description="Check two players matchup stats when on the same team, first is the reference player")
 @app_commands.describe(player1 = 'Reference Player you would like to check (same name as on spreadsheet)')
@@ -330,7 +330,7 @@ async def player_to_player_matchup_total(interaction: discord.Interaction, playe
         cell = str(column)+str(row)    
         data = Helper.sheet[cell].value
         row = row + 1
-        await interaction.response.send_message(f'when {player1} and {player2} are both on the same team their winrate is {data}.')
+        await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are both on the same team their winrate is {data}.')
         
 
 @bot.tree.command(name="player_to_player_winrate_delta", description="Check two players winrate delta when playing together, first is the reference player")
@@ -352,10 +352,14 @@ async def player_to_player_winrate_delta(interaction: discord.Interaction, playe
                 data.append(Helper.sheet[cell].value)
                 row = row + 1
         data[2] = data[2]*100
-        await interaction.response.send_message(f'when {player1} and {player2} are on the evil team together the first players default evil winrate changes by {data[0]} (absolute), if they are together on the good team their winrate changes by {data[1]} (absolute), on average if both players are on the same team the first players average winrate delta is an absolute value of {data[2]}%.')
+        await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are on the evil team together the first players default evil winrate changes by {data[0]} (absolute), if they are together on the good team their winrate changes by {data[1]} (absolute), on average if both players are on the same team the first players average winrate delta is an absolute value of {data[2]}%.')
 
 # reused for both fun and strength comparisons
 async def send_new_comparison(interaction: discord.Interaction, is_initial: bool, category: str, message_text: str):
+        # Defer the interaction to keep it valid for follow-ups
+        if not interaction.response.is_done():
+            await interaction.response.defer(ephemeral=True)
+
         role1, role2 = random.sample(spreadsheetValues.role_list, 2)
 
         async def button_callback(interaction: discord.Interaction, selected_role: str):
@@ -368,8 +372,8 @@ async def send_new_comparison(interaction: discord.Interaction, is_initial: bool
         role1_image = Helper.get_role_image(role1)
         role2_image = Helper.get_role_image(role2)
 
-        button1 = Button(label=role1, style=discord.ButtonStyle.primary)
-        button2 = Button(label=role2, style=discord.ButtonStyle.primary)
+        button1 = Button(label=role1.capitalize(), style=discord.ButtonStyle.primary)
+        button2 = Button(label=role2.capitalize(), style=discord.ButtonStyle.primary)
         skip_button = Button(label="Do Not Know", style=discord.ButtonStyle.secondary)
 
         button1.callback = lambda i: button_callback(i, role1)
@@ -385,13 +389,25 @@ async def send_new_comparison(interaction: discord.Interaction, is_initial: bool
         content = message_text
         if role1_image:
             files.append(discord.File(role1_image, filename="role1.png"))
-            content += f"\nRole 1: {role1}"
         if role2_image:
             files.append(discord.File(role2_image, filename="role2.png"))
-            content += f"\nRole 2: {role2}"
+
+        role1_rules = Helper.get_role_rules(role1)
+        role2_rules = Helper.get_role_rules(role2)
+
+        # preventing homebrew since they are non specific
+        while "homebrew" in role1.lower() or "homebrew" in role2.lower():
+            role1, role2 = random.sample(spreadsheetValues.role_list, 2)
+
+        if role1_rules:
+            with open(role1_rules, "r") as file:
+                content += f"\n{role1.capitalize()}:\n" + file.read()
+        if role2_rules:
+            with open(role2_rules, "r") as file:
+                content += f"\n{role2.capitalize()}:\n" + file.read()
 
         if is_initial:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 content=content, view=view, ephemeral=True, files=files
             )
         else:
@@ -407,41 +423,49 @@ async def role_fun_comparison(interaction: discord.Interaction):
 async def role_strength_comparison(interaction: discord.Interaction):
     await send_new_comparison(interaction, is_initial=True, category="strength", message_text="Which role is stronger?")
 
-@bot.tree.command(name="role_fun_ranking", description="Display a ranking of roles based on pairwise comparisons")
-async def role_fun_ranking(interaction: discord.Interaction):
-    ranked_roles = Pairwise.generate_role_ranking(category="fun")
+@bot.tree.command(name="role_ranking", description="Display a ranking of roles based on pairwise comparisons")
+@app_commands.choices(category=[
+    app_commands.Choice(name="Fun", value="fun"),
+    app_commands.Choice(name="Strength", value="strength")
+])
+async def role_ranking(interaction: discord.Interaction, category: app_commands.Choice[str]):
+    ranked_roles = Pairwise.generate_role_ranking(category=category.value)
+
     if not ranked_roles:
         await interaction.response.send_message("No ranking data available.", ephemeral=True)
         return
 
     ranking_message = "\n".join(
-        [f"{i + 1}. {role} (Score: {score})" for i, (role, score) in enumerate(ranked_roles)]
-    )
-    
-    await interaction.response.send_message(
-        f"Role Ranking:\n{ranking_message}", ephemeral=True
+        [f"{i + 1}. {role.capitalize()} (Score: {score})" for i, (role, score) in enumerate(ranked_roles)]
     )
 
-@bot.tree.command(name="role_strength_ranking", description="Display a ranking of roles based on pairwise comparisons")
-async def role_strength_ranking(interaction: discord.Interaction):
-    ranked_roles = Pairwise.generate_role_ranking(category="strength")
-    
-    if not ranked_roles:
-        await interaction.response.send_message("No ranking data available.", ephemeral=True)
-        return
-    
-    ranking_message = "\n".join(
-        [f"{i + 1}. {role} (Score: {score})" for i, (role, score) in enumerate(ranked_roles)]
-    )
-    
     await interaction.response.send_message(
         f"Role Ranking:\n{ranking_message}", ephemeral=True
     )
+    
+@bot.tree.command(name="get_role", description="Get the data for a specific role")
+async def get_role(interaction: discord.Interaction, role: str):
+    rules_path = Helper.get_role_rules(role)
+    image_path = Helper.get_role_image(role)
+    files = []
+    if image_path:
+        files.append(discord.File(image_path, filename="role.png"))
+
+    if rules_path:
+        with open(rules_path, "r") as file:
+            rules_content = file.read()
+        await interaction.response.send_message(
+            f"{role.capitalize()}:\n{rules_content}", files=files
+        )
+    else:
+        await interaction.response.send_message(
+            f"No role found for: {role}", ephemeral=True, files=files
+        )
 
 @bot.event
 async def on_ready():
     Helper.setup_class()
-    #await bot.get_channel(1302801362517622874).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
+    await bot.get_channel(1302801362517622874).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
     
 
 bot.run(token)

@@ -245,7 +245,7 @@ def setup_class():
                 spreadsheetValues.average_total = row
             case 'Total Played':
                 spreadsheetValues.total_played = row
-            case _ if value not in ['Usernames','Townsfolk Roles', 'Outsider Roles', 'Minion Roles', 'Demon Roles']:
+            case _ if value not in ['Players','Usernames','Townsfolk Roles', 'Outsider Roles', 'Minion Roles', 'Demon Roles']:
                 spreadsheetValues.role_list.append(value.lower())
                 spreadsheetValues.role_list_idx.append(row)
         row += 1
@@ -323,3 +323,8 @@ def get_role_image(role: str):
     sanitized_role = role.replace(" ", "").replace("-", "").lower()
     image_path = Path("role-images") / f"{sanitized_role}.png"
     return image_path if image_path.exists() else None
+
+def get_role_rules(role: str):
+    sanitized_role = role.replace(" ", "").replace("-", "").lower()
+    rules_path = Path("role-rules") / f"{sanitized_role}.txt"
+    return rules_path if rules_path.exists() else None
