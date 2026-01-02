@@ -320,11 +320,11 @@ def find_role_matchup(Row: int) -> int:
         return "ERROR"
     
 def get_role_image(role: str):
-    sanitized_role = role.replace(" ", "").replace("-", "").lower()
+    sanitized_role = role.replace(" ", "").replace("-", "").replace("'", "").lower()
     image_path = Path("role-images") / f"{sanitized_role}.png"
     return image_path if image_path.exists() else None
 
 def get_role_rules(role: str):
-    sanitized_role = role.replace(" ", "").replace("-", "").lower()
+    sanitized_role = role.replace(" ", "").replace("-", "").replace("'", "").lower()
     rules_path = Path("role-rules") / f"{sanitized_role}.txt"
     return rules_path if rules_path.exists() else None

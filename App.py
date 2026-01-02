@@ -8,6 +8,7 @@ from discord.ui import View, Button
 from discord.ext import commands
 from pathlib import Path
 from Spreadsheetclass import spreadsheetValues
+import csv
 
 bot = commands.Bot(command_prefix='!', intents = discord.Intents.all())
 
@@ -399,6 +400,19 @@ async def send_new_comparison(interaction: discord.Interaction, is_initial: bool
         while "homebrew" in role1.lower() or "homebrew" in role2.lower():
             role1, role2 = random.sample(spreadsheetValues.role_list, 2)
 
+        # Update images and rules after ensuring valid roles
+        role1_image = Helper.get_role_image(role1)
+        role2_image = Helper.get_role_image(role2)
+        role1_rules = Helper.get_role_rules(role1)
+        role2_rules = Helper.get_role_rules(role2)
+
+        files = []
+        content = message_text
+        if role1_image:
+            files.append(discord.File(role1_image, filename="role1.png"))
+        if role2_image:
+            files.append(discord.File(role2_image, filename="role2.png"))
+
         if role1_rules:
             with open(role1_rules, "r") as file:
                 content += f"\n{role1.capitalize()}:\n" + file.read()
@@ -435,12 +449,19 @@ async def role_ranking(interaction: discord.Interaction, category: app_commands.
         await interaction.response.send_message("No ranking data available.", ephemeral=True)
         return
 
-    ranking_message = "\n".join(
-        [f"{i + 1}. {role.capitalize()} (Score: {score})" for i, (role, score) in enumerate(ranked_roles)]
-    )
+    # Export the ranking to a CSV file
+    csv_file_path = "role_ranking.csv"
+    with open(csv_file_path, "w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["Rank", "Role", "Score"])
+        for i, (role, score) in enumerate(ranked_roles):
+            writer.writerow([i + 1, role.capitalize(), score])
 
+    # Send the CSV file as a response
     await interaction.response.send_message(
-        f"Role Ranking:\n{ranking_message}", ephemeral=True
+        content="The role ranking is too long to display here. Please find the ranking in the attached CSV file.",
+        file=discord.File(csv_file_path),
+        ephemeral=True
     )
     
 @bot.tree.command(name="get_role", description="Get the data for a specific role")
@@ -465,7 +486,7 @@ async def get_role(interaction: discord.Interaction, role: str):
 @bot.event
 async def on_ready():
     Helper.setup_class()
-    await bot.get_channel(1302801362517622874).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
+    #await bot.get_channel(1302801362517622874).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
     
 
 bot.run(token)
