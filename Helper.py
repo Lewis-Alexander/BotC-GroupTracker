@@ -2,6 +2,7 @@ import array
 import csv
 import xlwings as xw
 from Spreadsheetclass import spreadsheetValues
+from pathlib import Path
 
 workbook = xw.Book('BotC-Stats.xlsx')
 sheet = workbook.sheets['Sheet1']
@@ -244,7 +245,7 @@ def setup_class():
                 spreadsheetValues.average_total = row
             case 'Total Played':
                 spreadsheetValues.total_played = row
-            case _ if value not in ['Townsfolk Roles', 'Outsider Roles', 'Minion Roles', 'Demon Roles']:
+            case _ if value not in ['Usernames','Townsfolk Roles', 'Outsider Roles', 'Minion Roles', 'Demon Roles']:
                 spreadsheetValues.role_list.append(value.lower())
                 spreadsheetValues.role_list_idx.append(row)
         row += 1
@@ -317,3 +318,8 @@ def find_role_matchup(Row: int) -> int:
         return 3
     else: #error
         return "ERROR"
+    
+def get_role_image(role: str):
+    sanitized_role = role.replace(" ", "").replace("-", "").lower()
+    image_path = Path("role-images") / f"{sanitized_role}.png"
+    return image_path if image_path.exists() else None
