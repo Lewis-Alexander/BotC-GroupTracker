@@ -364,10 +364,12 @@ async def send_new_comparison(interaction: discord.Interaction, is_initial: bool
         role1, role2 = random.sample(spreadsheetValues.role_list, 2)
 
         async def button_callback(interaction: discord.Interaction, selected_role: str):
+            await interaction.response.edit_message(content="Loading next comparison...", view=None)
             Pairwise.save_pairwise_comparison(role1, role2, selected_role, category=category)
             await send_new_comparison(interaction, is_initial=False, category=category, message_text=message_text)
 
         async def skip_callback(interaction: discord.Interaction):
+            await interaction.response.edit_message(content="Loading next comparison...", view=None)
             await send_new_comparison(interaction, is_initial=False, category=category, message_text=message_text)
 
         role1_image = Helper.get_role_image(role1)
