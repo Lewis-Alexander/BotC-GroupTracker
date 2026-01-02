@@ -1,0 +1,1 @@
+If more than 1 good player is executed, evil wins. All players know you are in play. After day 5, evil wins.

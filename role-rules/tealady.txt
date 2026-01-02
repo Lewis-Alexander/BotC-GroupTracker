@@ -1,0 +1,1 @@
+If both your alive neighbors are good, they can't die.

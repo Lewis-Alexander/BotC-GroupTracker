@@ -1,0 +1,1 @@
+Each night*, choose a player: they die. You start by choosing a player: they are poisoned. You die if & only if they are dead.

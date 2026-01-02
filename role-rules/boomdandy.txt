@@ -1,0 +1,1 @@
+If you are executed, all but 3 players die. After a 10 to 1 countdown, the player with the most players pointing at them, dies.

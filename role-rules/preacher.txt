@@ -1,0 +1,1 @@
+Each night, choose a player: a Minion, if chosen, learns this. All chosen Minions have no ability.
