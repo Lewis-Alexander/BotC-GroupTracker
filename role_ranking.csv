@@ -1,75 +1,131 @@
 Rank,Role,Score
-1,Savant,1.5
-2,Golem,1.5
-3,Engineer,1.5
-4,Fear monger,1.5
-5,Harpy,1.25
-6,Amnesiac,1.0
-7,Town crier,1.0
-8,Village idiot,1.0
-9,Hermit,1.0
-10,Homebrew demon,1.0
-11,Magician,1.0
-12,Mezepheles,1.0
-13,Vortox,1.0
-14,Ogre,1.0
-15,Wizard,1.0
-16,Organ grinder,1.0
-17,Summoner,1.0
-18,Po,1.0
-19,Witch,1.0
-20,Fang gu,1.0
-21,Mathmetician,1.0
-22,Marionette,1.0
-23,Seamstress,1.0
-24,Widow,1.0
-25,Devil's advocate,1.0
-26,Vizier,1.0
-27,High priestess,1.0
-28,Yaggababble,1.0
-29,Oracle,1.0
-30,Leviathan,1.0
-31,Courtier,1.0
-32,Politician,0.3333333333333333
-33,Sailor,0.3333333333333333
-34,General,0.25
-35,Knight,0.0
-36,Boomdandy,0.0
-37,Psychopath,0.0
-38,Spy,0.0
-39,Pixie,0.0
-40,Ojo,-0.3333333333333333
-41,Librarian,-0.3333333333333333
-42,Princess,-1.0
-43,Snitch,-1.0
-44,Bounty hunter,-1.0
-45,Drunk,-1.0
-46,Sage,-1.0
-47,Preacher,-1.0
-48,Lleech,-1.0
-49,Undertaker,-1.0
-50,Sweetheart,-1.0
-51,Soldier,-1.0
-52,Moonchild,-1.0
-53,Shugenja,-1.0
-54,Evil twin,-1.0
-55,Snake charmer,-1.0
-56,Choirboy,-1.0
-57,Ravenkeeper,-1.0
-58,Empath,-1.0
-59,Lunatic,-1.0
-60,Balloonist,-1.0
-61,Poppy grower,-1.0
-62,Farmer,-1.0
-63,Plague doctor,-1.0
-64,Heretic,-1.0
-65,Acrobat,-1.0
-66,Clockmaker,-1.0
-67,Fool,-1.0
-68,Riot,-1.0
-69,Noble,-1.0
-70,Damsel,-1.0
-71,Banshee,-1.0
-72,Professor,-1.0
-73,Zealot,-1.0
-74,Godfather,-1.0
+1,Golem,2.0
+2,Savant,2.0
+3,Amnesiac,1.8333333333333333
+4,Widow,1.5
+5,Yaggababble,1.5
+6,Courtier,1.5
+7,Fearmonger,1.5
+8,Baron,1.5
+9,Exorcist,1.5
+10,Spy,1.375
+11,Atheist,1.375
+12,Magician,1.3333333333333333
+13,Organ grinder,1.3333333333333333
+14,Poisoner,1.3333333333333333
+15,Po,1.3
+16,Harpy,1.25
+17,Witch,1.25
+18,Devil's advocate,1.25
+19,Kazali,1.25
+20,Pit-hag,1.25
+21,Legion,1.25
+22,Wizard,1.1666666666666667
+23,Summoner,1.1428571428571428
+24,Politician,1.125
+25,Goon,1.125
+26,Mezepheles,1.0
+27,Mathematician,1.0
+28,Oracle,1.0
+29,Goblin,1.0
+30,Fisherman,1.0
+31,Slayer,1.0
+32,No dashii,1.0
+33,Wraith,1.0
+34,Al-hadikhia,1.0
+35,Vizier,0.9
+36,General,0.8
+37,Philosopher,0.75
+38,Ojo,0.7
+39,High priestess,0.7
+40,Vigormortis,0.6666666666666666
+41,Village idiot,0.625
+42,Pixie,0.625
+43,Alsaahir,0.625
+44,Vortox,0.5714285714285714
+45,Psychopath,0.5714285714285714
+46,Hermit,0.5
+47,Boomdandy,0.5
+48,Ogre,0.5
+49,Alchemist,0.5
+50,Xaan,0.5
+51,Gossip,0.5
+52,Seamstress,0.3333333333333333
+53,Professor,0.3333333333333333
+54,Lil' monsta,0.3333333333333333
+55,Huntsman,0.3333333333333333
+56,Virgin,0.3333333333333333
+57,Sailor,0.3
+58,Balloonist,0.25
+59,Lycanthrope,0.25
+60,Cerenovus,0.25
+61,Marionette,0.21428571428571427
+62,Moonchild,0.125
+63,Evil twin,0.125
+64,Farmer,0.0
+65,Acrobat,0.0
+66,Leviathan,0.0
+67,Mastermind,0.0
+68,Imp,0.0
+69,Knight,-0.1
+70,Bounty hunter,-0.125
+71,Preacher,-0.16666666666666666
+72,Fang gu,-0.16666666666666666
+73,Poppy grower,-0.16666666666666666
+74,Godfather,-0.2
+75,Lleech,-0.25
+76,Town crier,-0.3333333333333333
+77,Plague doctor,-0.3333333333333333
+78,Investigator,-0.3333333333333333
+79,Flowergirl,-0.3333333333333333
+80,Artist,-0.3333333333333333
+81,Cult leader,-0.3333333333333333
+82,Clockmaker,-0.375
+83,Engineer,-0.375
+84,Empath,-0.5
+85,Drunk,-0.5
+86,Librarian,-0.5
+87,Banshee,-0.5
+88,Grandmother,-0.6
+89,Lunatic,-0.7142857142857143
+90,Princess,-1.0
+91,Snitch,-1.0
+92,Sage,-1.0
+93,Undertaker,-1.0
+94,Sweetheart,-1.0
+95,Soldier,-1.0
+96,Shugenja,-1.0
+97,Snake charmer,-1.0
+98,Choirboy,-1.0
+99,Ravenkeeper,-1.0
+100,Heretic,-1.0
+101,Fool,-1.0
+102,Riot,-1.0
+103,Noble,-1.0
+104,Damsel,-1.0
+105,Zealot,-1.0
+106,Scarlet woman,-1.0
+107,Zombuul,-1.0
+108,Mayor,-1.0
+109,Shabaloth,-1.0
+110,Dreamer,-1.0
+111,Assassin,-1.0
+112,Minstrel,-1.0
+113,Recluse,-1.0
+114,Tinker,-1.0
+115,Steward,-1.0
+116,Puzzlemaster,-1.0
+117,Juggler,-1.0
+118,Cannibal,-1.0
+119,Monk,-1.0
+120,Innkeeper,-1.0
+121,Pukka,-1.0
+122,Butler,-1.0
+123,Klutz,-1.0
+124,Chambermaid,-1.0
+125,Fortune teller,-1.0
+126,Hatter,-1.0
+127,Gambler,-1.0
+128,Chef,-1.0
+129,Tea lady,-1.0
+130,Washerwoman,-1.0

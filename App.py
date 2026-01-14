@@ -487,7 +487,34 @@ async def get_role(interaction: discord.Interaction, role: str):
 @bot.event
 async def on_ready():
     Helper.setup_class()
-    #await bot.get_channel(1302801362517622874).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
+    await bot.get_channel(1302801362517622874).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
     
+@bot.tree.command(name="upload_all_session_csvs", description="Select a session and upload all CSVs for that session")
+async def upload_all_session_csvs(interaction: discord.Interaction):
+    sessions_path = Path("Historical Results")
+    sessions = [folder.name for folder in sessions_path.iterdir() if folder.is_dir()]
+
+    class SessionDropdown(discord.ui.Select):
+        def __init__(self):
+            options = [discord.SelectOption(label=session) for session in sessions]
+            super().__init__(placeholder="Select a session", min_values=1, max_values=1, options=options)
+
+        async def callback(self, interaction: discord.Interaction):
+            selected_session = self.values[0]
+            session_path = sessions_path / selected_session
+            csv_files = list(session_path.glob("*.csv"))
+            if not csv_files:
+                await interaction.response.edit_message(content=f"No CSV files found in session {selected_session}.", view=None)
+                return
+
+            files = [discord.File(csv_file) for csv_file in csv_files]
+            await interaction.response.edit_message(content=f"Uploading CSV files for session {selected_session} 1 means good team won 0 means evil team won:", attachments=files, view=None)
+
+    class SessionDropdownView(discord.ui.View):
+        def __init__(self):
+            super().__init__()
+            self.add_item(SessionDropdown())
+
+    await interaction.response.send_message("Please select a session:", view=SessionDropdownView(), ephemeral=True)
 
 bot.run(token)
