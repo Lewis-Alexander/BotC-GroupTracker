@@ -487,7 +487,7 @@ async def get_role(interaction: discord.Interaction, role: str):
 @bot.event
 async def on_ready():
     Helper.setup_class()
-    await bot.get_channel(1302801362517622874).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
+    #await bot.get_channel(1302801362517622874).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
     
 
 bot.run(token)
