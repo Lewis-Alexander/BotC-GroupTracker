@@ -508,7 +508,7 @@ async def upload_all_session_csvs(interaction: discord.Interaction):
                 return
 
             files = [discord.File(csv_file) for csv_file in csv_files]
-            await interaction.response.edit_message(content=f"Uploading CSV files for session {selected_session} 1 means good team won 0 means evil team won:", attachments=files, view=None)
+            await interaction.response.edit_message(content=f"Uploading CSV files for session {selected_session}, 1 means good team won. 0 means evil team won:", attachments=files, view=None)
 
     class SessionDropdownView(discord.ui.View):
         def __init__(self):
