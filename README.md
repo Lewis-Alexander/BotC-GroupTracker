@@ -27,6 +27,7 @@ This is a discord bot that allows a group that runs Blood on the Clocktower sess
   - Save the excel sheet then close it
 
 ***Usage Explanation***
+
 Run Bot.py, the bot should specify when it is ready in the channel you specified in token.py.
 The bot will also open excel it needs to be open for the code to work.
 Type / then the options should show in the menu if not run !sync and ctrl r to force refresh the discord app.
