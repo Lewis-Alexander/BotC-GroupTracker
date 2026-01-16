@@ -23,7 +23,7 @@ This is a discord bot that allows a group that runs Blood on the Clocktower sess
   role_80_id = roleinserverfor80games
   role_100_id = roleinserverfor100games
 ```
-  - Open BotcStats.xls then replace all but one of the template sections with your players, when you need to add a new player copy the remaining template then insert before that template column you will also need to repeat for the template column in the matchup section (By default i assume that you will move the empty space for self to self matchups if you dont want to bother with that fill in the empty slot in the template)
+  - Open BotcStats.xls then replace all but one of the template sections with your players make sure to paste in the players usernames below their names in the spreadsheet, when you need to add a new player copy the remaining template then insert before that template column you will also need to repeat for the template column in the matchup section (By default i assume that you will move the empty space for self to self matchups if you dont want to bother with that fill in the empty slot in the template)
   - Save the excel sheet then close it
 
 ***Usage Explanation***
