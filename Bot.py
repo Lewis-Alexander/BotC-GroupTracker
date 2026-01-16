@@ -119,7 +119,7 @@ async def upload_spreadsheet(interaction: discord.Interaction):
     await interaction.response.send_message(file=discord.File(r'BotC-Stats.xlsx'))
 
 @commands.is_owner()  # Prevent other people from using the command
-@bot.tree.command(name="update_spreadsheet", description="if program has a csv file it uses it to update the spreadsheet")
+@bot.tree.command(name="update_spreadsheet", description="if program has a csv file it uses it to update the spreadsheet then saves a copy of the csv to historical results")
 async def update_spreadsheet(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     my_file = Path("Results.csv")
@@ -513,7 +513,8 @@ async def upload_all_session_csvs(interaction: discord.Interaction):
             self.add_item(SessionDropdown())
 
     await interaction.response.send_message("Please select a session:", view=SessionDropdownView(), ephemeral=True)
-    
+
+@commands.is_owner()  # Prevent other people from using the command    
 @bot.tree.command(name="copy_results", description="Copy Results.csv to a selected session directory or create a new session directory")
 async def copy_results(interaction: discord.Interaction):
     results_file = Path("Results.csv")
