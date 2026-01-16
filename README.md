@@ -1,13 +1,15 @@
 ***Explanation***
+
 This is a discord bot that allows a group that runs Blood on the Clocktower session on the app or in person to track their stats and matchups between players.
 
 ***Set-Up***
+
   - Clone the github by clicking on code then copy either https or ssh then in cmd cd into the desired location and run
-    ```git clone (paste in whichever you copied)```
+```git clone (paste in whichever you copied)```
   - Create a new discord bot to get the token required following this guide:
-  ```https://www.writebots.com/discord-bot-token/```
+```https://www.writebots.com/discord-bot-token/```
   - Create a new file in the base directory called token.py and copy this example then replace the temp text:
-  ```
+```
   from os import path
   token = 'copytokenhere'
   path = r'pathtoBotCStats.xls'
@@ -20,7 +22,7 @@ This is a discord bot that allows a group that runs Blood on the Clocktower sess
   role_60_id = roleinserverfor60games
   role_80_id = roleinserverfor80games
   role_100_id = roleinserverfor100games
-  ```
+```
   - Open BotcStats.xls then replace all but one of the template sections with your players, when you need to add a new player copy the remaining template then insert before that template column you will also need to repeat for the template column in the matchup section (By default i assume that you will move the empty space for self to self matchups if you dont want to bother with that fill in the empty slot in the template)
   - Save the excel sheet then close it
 
