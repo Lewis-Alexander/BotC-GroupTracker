@@ -119,12 +119,26 @@ async def upload_spreadsheet(interaction: discord.Interaction):
     await interaction.response.send_message(file=discord.File(r'BotC-Stats.xlsx'))
 
 @commands.is_owner()  # Prevent other people from using the command
-@bot.tree.command(name="update_spreadsheet", description="if program has a csv file it uses it to update the spreadsheet then saves a copy of the csv to historical results")
+@bot.tree.command(name="update_spreadsheet", description="if program has a csv file it uses it to update the spreadsheet")
 async def update_spreadsheet(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     my_file = Path("Results.csv")
     if my_file.is_file():
         data = Helper.separate_file()
+
+        invalid_entries = []
+        for row in data:
+            player, role = row[0], row[1]
+            if Helper.find_player(player.lower()) == "ERROR":
+                invalid_entries.append(f"Player: {player}")
+            if Helper.find_role(role.lower()) == "ERROR":
+                invalid_entries.append(f"Role: {role}")
+
+        if invalid_entries:
+            error_message = "Invalid entries found: " + ", ".join(invalid_entries)
+            await interaction.followup.send(error_message, ephemeral=True)
+            return
+
         Helper.update_stats(data)
         await interaction.followup.send(f'spreadsheet updated', ephemeral=True)
 
