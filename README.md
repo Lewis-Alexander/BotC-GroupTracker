@@ -8,7 +8,7 @@ This is a discord bot that allows a group that runs Blood on the Clocktower sess
 ```git clone (paste in whichever you copied)```
   - Create a new discord bot to get the token required following this guide:
 ```https://www.writebots.com/discord-bot-token/```
-  - Create a new file in the base directory called token.py and copy this example then replace the temp text:
+  - Create a new file in the base directory called token.py and copy this example then replace the temp text ensure you have developer mode on discord then right click on the server/role/channel and select copy id:
 ```
   from os import path
   token = 'copytokenhere'
