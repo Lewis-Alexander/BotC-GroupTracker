@@ -53,7 +53,7 @@ Type / then the options should show in the menu if not run !sync and ctrl r to f
   - update_role (updates own role by using username)
 
 **Pairwise selection**
-  - if you would like the roles to show an image along with the rules text just add png's to role-images with the same name as the txt file in role-rules.
+  - if you would like the roles to show an image along with the rules text just add png's to a new folder called role-images with the same name as the txt file in role-rules.
   - run either /role_fun_comparison or /role_strength_comparison.
   - the selections will then be saved in their own respective csv files.
   - the rankings can then be shown by using /role_ranking
