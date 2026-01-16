@@ -3,7 +3,7 @@ import csv
 import xlwings as xw
 from Spreadsheetclass import spreadsheetValues
 from pathlib import Path
-import token
+from Token import path
 
 workbook = xw.Book('BotC-Stats.xlsx')
 sheet = workbook.sheets['Sheet1']
@@ -40,7 +40,7 @@ def update_good_stat(column: int, row: int, good_win: int) -> None:
     value += 1
     sheet[cell].value = value
     workbook.save()
-    workbook.save(token.path)
+    workbook.save(path)
     
 
 def update_evil_stat(column: int, row: int, good_win: int) -> None:
@@ -51,7 +51,7 @@ def update_evil_stat(column: int, row: int, good_win: int) -> None:
     value += 1
     sheet[cell].value = value
     workbook.save()
-    workbook.save(token.path)
+    workbook.save(path)
     
 def update_player_matchup(column: int, row: int, col_player: int, row_player: int,won: int) -> None:
     if((col_player == 1 and (row_player == 2 or row_player == 3)) or ((col_player == 2 or col_player == 3) and row_player == 1)): #on different teams
@@ -77,7 +77,7 @@ def update_player_matchup(column: int, row: int, col_player: int, row_player: in
     value += 1
     sheet[cell].value = value
     workbook.save()
-    workbook.save(token.path)
+    workbook.save(path)
     if(evil == 0): # was on good team so no evil matchup to update
         return
     row = row + evil
@@ -86,7 +86,7 @@ def update_player_matchup(column: int, row: int, col_player: int, row_player: in
     value += 1
     sheet[cell].value = value
     workbook.save()
-    workbook.save(token.path)
+    workbook.save(path)
 
 def update_stats(Data: array) -> None:
     i = 0

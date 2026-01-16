@@ -2,7 +2,7 @@ import discord
 import Helper
 import Pairwise
 import random
-from Token import token
+from Token import token, bot_channel_id, server_id, role_0_id, role_10_id, role_20_id, role_40_id, role_60_id, role_80_id, role_100_id
 from discord import app_commands
 from discord.ui import View, Button
 from discord.ext import commands
@@ -17,7 +17,6 @@ async def on_ready():
     print(f'Running as {bot.user}')
     print(bot.user.id)
 
-guild = discord.Object(id='1303745588302708807')
 @bot.command()
 @commands.guild_only()
 @commands.is_owner()  # Prevent other people from using the command
@@ -128,7 +127,9 @@ async def update_spreadsheet(interaction: discord.Interaction):
         data = Helper.separate_file()
         Helper.update_stats(data)
         await interaction.followup.send(f'spreadsheet updated', ephemeral=True)
-        
+
+        await copy_results(interaction)
+
 @commands.is_owner()  # Prevent other people from using the command
 @bot.tree.command(name="update_matchups", description="if program has a csv file it uses it to update the spreadsheet")
 async def update_matchups(interaction: discord.Interaction):
@@ -141,14 +142,14 @@ async def update_matchups(interaction: discord.Interaction):
 
 @bot.tree.command(name="update_role", description="auto update personal role from database")
 async def update_role(interaction : discord.Interaction):
-    server = bot.get_guild(1192193425739612281)
-    role0 = server.get_role(1294069983151919134)
-    role10 = server.get_role(1451683827897597973)
-    role20 = server.get_role(1294281073043177535)
-    role40 = server.get_role(1294068836764614788)
-    role60 = server.get_role(1294069566409801760)
-    role80 = server.get_role(1294068801448574996)
-    role100 = server.get_role(1294068667801276426)
+    server = bot.get_guild(server_id)
+    role0 = server.get_role(role_0_id)
+    role10 = server.get_role(role_10_id)
+    role20 = server.get_role(role_20_id)
+    role40 = server.get_role(role_40_id)
+    role60 = server.get_role(role_60_id)
+    role80 = server.get_role(role_80_id)
+    role100 = server.get_role(role_100_id)
     member = interaction.user
     column = Helper.find_player_username(member.name)
     column = Helper.increment_col(column)
@@ -239,13 +240,13 @@ async def update_user_role(interaction: discord.Interaction, user: discord.Membe
 
         # Define roles based on the algorithm in update_role
         server = interaction.guild
-        role0 = server.get_role(1294069983151919134)
-        role10 = server.get_role(1451683827897597973)
-        role20 = server.get_role(1294281073043177535)
-        role40 = server.get_role(1294068836764614788)
-        role60 = server.get_role(1294069566409801760)
-        role80 = server.get_role(1294068801448574996)
-        role100 = server.get_role(1294068667801276426)
+        role0 = server.get_role(role_0_id)
+        role10 = server.get_role(role_10_id)
+        role20 = server.get_role(role_20_id)
+        role40 = server.get_role(role_40_id)
+        role60 = server.get_role(role_60_id)
+        role80 = server.get_role(role_80_id)
+        role100 = server.get_role(role_100_id)
 
         # Assign roles based on the total games played
         if cellval < 10:
@@ -484,10 +485,6 @@ async def get_role(interaction: discord.Interaction, role: str):
             f"No role found for: {role}", ephemeral=True, files=files
         )
 
-@bot.event
-async def on_ready():
-    Helper.setup_class()
-    await bot.get_channel(1302801362517622874).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
     
 @bot.tree.command(name="upload_all_session_csvs", description="Select a session and upload all CSVs for that session")
 async def upload_all_session_csvs(interaction: discord.Interaction):
@@ -516,5 +513,82 @@ async def upload_all_session_csvs(interaction: discord.Interaction):
             self.add_item(SessionDropdown())
 
     await interaction.response.send_message("Please select a session:", view=SessionDropdownView(), ephemeral=True)
+    
+@bot.tree.command(name="copy_results", description="Copy Results.csv to a selected session directory or create a new session directory")
+async def copy_results(interaction: discord.Interaction):
+    results_file = Path("Results.csv")
+    if not results_file.is_file():
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send("Results.csv not found.", ephemeral=True)
+            else:
+                await interaction.response.send_message("Results.csv not found.", ephemeral=True)
+        except discord.errors.NotFound:
+            await interaction.response.send_message("Results.csv not found.", ephemeral=True)
+        return
+
+    sessions_path = Path("Historical Results")
+    sessions = [folder.name for folder in sessions_path.iterdir() if folder.is_dir()]
+
+    class SessionDropdown(discord.ui.Select):
+        def __init__(self):
+            options = [discord.SelectOption(label=session) for session in sessions]
+            super().__init__(placeholder="Select a session", min_values=1, max_values=1, options=options)
+
+        async def callback(self, interaction: discord.Interaction):
+            selected_session = self.values[0]
+            session_path = sessions_path / selected_session
+
+            # Determine and use the session number from the directory name
+            session_number = int(selected_session.split('-')[1])
+            existing_files = list(session_path.glob(f"S{session_number}Results*.csv"))
+            new_file_number = len(existing_files) + 1
+            new_file_name = f"S{session_number}Results{new_file_number}.csv"
+
+            destination = session_path / new_file_name
+            try:
+                destination.write_bytes(results_file.read_bytes())
+                await interaction.response.edit_message(content=f"Results.csv has been copied to {selected_session} as {new_file_name}.", view=None)
+            except Exception as e:
+                await interaction.response.edit_message(content=f"Failed to copy Results.csv: {str(e)}", view=None)
+
+    class CreateSessionButton(discord.ui.Button):
+        def __init__(self):
+            super().__init__(label="Create New Session", style=discord.ButtonStyle.primary)
+
+        async def callback(self, interaction: discord.Interaction):
+            new_session_number = 1
+            while (sessions_path / f"Session-{new_session_number}").exists():
+                new_session_number += 1
+            new_session_path = sessions_path / f"Session-{new_session_number}"
+            try:
+                new_session_path.mkdir()
+                session_number = new_session_number
+                new_file_name = f"S{session_number}Results1.csv"
+                destination = new_session_path / new_file_name
+                destination.write_bytes(results_file.read_bytes())
+
+                await interaction.response.edit_message(content=f"Created new session directory: Session-{new_session_number} and copied Results.csv as {new_file_name}.", view=None)
+            except Exception as e:
+                await interaction.response.edit_message(content=f"Failed to create new session directory or copy Results.csv: {str(e)}", view=None)
+
+    class SessionDropdownView(discord.ui.View):
+        def __init__(self):
+            super().__init__()
+            self.add_item(SessionDropdown())
+            self.add_item(CreateSessionButton())
+
+    try:
+        if interaction.response.is_done():
+            await interaction.followup.send("Please select a session or create a new one:", view=SessionDropdownView(), ephemeral=True)
+        else:
+            await interaction.response.send_message("Please select a session or create a new one:", view=SessionDropdownView(), ephemeral=True)
+    except discord.errors.NotFound:
+        await interaction.response.send_message("Please select a session or create a new one:", view=SessionDropdownView(), ephemeral=True)
+@bot.event
+async def on_ready():
+    Helper.setup_class()
+    await bot.get_channel(bot_channel_id).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
+
 
 bot.run(token)
