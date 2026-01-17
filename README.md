@@ -1,3 +1,10 @@
+***Pre-requsites***
+Python
+pip modules:
+  - xlwings
+  - discord.py
+Excel with an account
+
 ***Explanation***
 
 This is a discord bot that allows a group that runs Blood on the Clocktower session on the app or in person to track their stats and matchups between players.
