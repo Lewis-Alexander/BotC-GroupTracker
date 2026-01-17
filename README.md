@@ -1,6 +1,7 @@
 ***Pre-requsites***
 
 Python
+
 pip dependencies:
   - xlwings
   - discord.py
