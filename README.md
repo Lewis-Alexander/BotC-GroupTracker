@@ -66,6 +66,9 @@ if any errors occur it will DM whichever userID is saved in the token file (to a
 
 **Add games played**
   - When you finish a game fill in results.csv with the winning team (1 for good wins 0 for evil wins) the players and the roles (ensure to place these in quotation marks) then save it.
+  - Instead of manually creating the file you can instead
+    - run /initialize_results which empties the csv file then initializes with which team won
+    - run /add_result_entry which adds one player and their role to the csv
   - run /update_spreadsheet it should show a bot thinking, then show update successful.
   - run /copy_results
   - you can check whether everything was updated succesfully in the excel sheet.
