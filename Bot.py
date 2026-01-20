@@ -664,10 +664,110 @@ async def copy_results(interaction: discord.Interaction):
     except discord.errors.NotFound:
         await interaction.response.send_message("Please select a session or create a new one:", view=SessionDropdownView(), ephemeral=True)
 
+@commands.is_owner()
+@bot.tree.command(name="initialize_results", description="Clear Results.csv and set the winning team (1=Good, 0=Evil)")
+@app_commands.choices(team=[
+    app_commands.Choice(name="Good Team Won", value="1"),
+    app_commands.Choice(name="Evil Team Won", value="0")
+])
+async def initialize_results(interaction: discord.Interaction, team: app_commands.Choice[str]):
+    try:
+        team_result = team.value
+        with open("Results.csv", "w", newline="") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow([team_result])
+        
+        team_name = "Good" if team_result == "1" else "Evil"
+        await interaction.response.send_message(
+            f"Results.csv cleared and initialized with {team_name} team win.",
+            ephemeral=True
+        )
+    except Exception as e:
+        await send_error_to_discord(e, "Command: initialize_results")
+        await interaction.response.send_message(
+            f"Failed to initialize Results.csv: {str(e)}",
+            ephemeral=True
+        )
+
+
+@commands.is_owner()
+@bot.tree.command(name="add_result_entry", description="Add a player and role entry to Results.csv")
+@app_commands.describe(player="Player name (must be in the player list)")
+@app_commands.describe(role="Role name (must be in the role list)")
+async def add_result_entry(interaction: discord.Interaction, player: str, role: str):
+    try:
+        if player.lower() not in spreadsheetValues.player_list:
+            await interaction.response.send_message(
+                f"Player '{player}' not found in player list. Please check the spelling.",
+                ephemeral=True
+            )
+            return
+        
+        if role.lower() not in spreadsheetValues.role_list:
+            await interaction.response.send_message(
+                f"Role '{role}' not found in role list. Please check the spelling.",
+                ephemeral=True
+            )
+            return
+        
+        results_file = Path("Results.csv")
+        if not results_file.is_file():
+            await interaction.response.send_message(
+                "Results.csv does not exist. Please run /initialize_results first.",
+                ephemeral=True
+            )
+            return
+        
+        with open("Results.csv", "a", newline="") as csvfile:
+            writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+            writer.writerow([player.lower()])
+            writer.writerow([role.lower()])
+        
+        await interaction.response.send_message(
+            f"Added {player.capitalize()} as {role.capitalize()} to Results.csv",
+            ephemeral=True
+        )
+    except Exception as e:
+        await send_error_to_discord(e, f"Command: add_result_entry with player={player}, role={role}")
+        await interaction.response.send_message(
+            f"Failed to add entry: {str(e)}",
+            ephemeral=True
+        )
+
+
+@commands.is_owner()
+@bot.tree.command(name="upload_cur_results", description="Upload the current Results.csv file")
+async def upload_cur_results(interaction: discord.Interaction):
+    try:
+        results_file = Path("Results.csv")
+        
+        if not results_file.is_file():
+            await interaction.response.send_message(
+                "Results.csv not found.",
+                ephemeral=True
+            )
+            return
+        
+        await interaction.response.send_message(
+            file=discord.File(results_file),
+            ephemeral=True
+        )
+    except Exception as e:
+        await send_error_to_discord(e, "Command: upload_results")
+        await interaction.response.send_message(
+            f"Failed to upload Results.csv: {str(e)}",
+            ephemeral=True
+        )
+
+
 @bot.event
 async def on_ready():
     Helper.setup_class()
     await bot.get_channel(bot_channel_id).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
 
 
-bot.run(token)
+try:
+    bot.run(token)
+except Exception as e:
+    print(f"Fatal error occurred: {str(e)}")
+    print(traceback.format_exc())
