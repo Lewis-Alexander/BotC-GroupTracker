@@ -1,12 +1,12 @@
 import array
 import csv
-import xlwings as xw
+import openpyxl
+from openpyxl.utils import get_column_letter
 from Spreadsheetclass import spreadsheetValues
 from pathlib import Path
-from Token import path
 
-workbook = xw.Book('BotC-Stats.xlsx')
-sheet = workbook.sheets['Sheet1']
+workbook = openpyxl.load_workbook('BotC-Stats.xlsx', data_only=True)
+sheet = workbook['Sheet1']
 
 def separate_file() -> array:
     with open('results.csv', newline='') as csvfile:
@@ -33,31 +33,29 @@ def replace_role_array(Role: array) ->array:
     return FixedRole
 
 def update_good_stat(column: int, row: int, good_win: int) -> None:
-    if(good_win[0] == '0'): #since good has not won increment lost instead of win
-        column = increment_col(column)
-    cell = str(column) + str(row)
-    value = sheet[cell].value
+    if good_win[0] == '0':  # since good has not won increment lost instead of win
+        column += 1
+    cell = f"{get_column_letter(column)}{row}"
+    value = sheet[cell].value or 0
     value += 1
     sheet[cell].value = value
-    workbook.save()
-    workbook.save(path)
+    workbook.save('BotC-Stats.xlsx')
     
 
 def update_evil_stat(column: int, row: int, good_win: int) -> None:
-    if(good_win[0] == '1'): #since good has won evil has not and thus must increment lost instead
-        column = increment_col(column)
-    cell = str(column) + str(row)
-    value = sheet[cell].value
+    if good_win[0] == '1':  # since good has won evil has not and thus must increment lost instead
+        column += 1
+    cell = f"{get_column_letter(column)}{row}"
+    value = sheet[cell].value or 0
     value += 1
     sheet[cell].value = value
-    workbook.save()
-    workbook.save(path)
+    workbook.save('BotC-Stats.xlsx')
     
 def update_player_matchup(column: int, row: int, col_player: int, row_player: int,won: int) -> None:
     if((col_player == 1 and (row_player == 2 or row_player == 3)) or ((col_player == 2 or col_player == 3) and row_player == 1)): #on different teams
         return
     if((won[0] == '0' and col_player == 1) or (won[0] == '1' and (col_player == 2 or col_player == 3))): #since player has not won increment lost instead of win
-        column = increment_col(column)
+        column += 1
     gap = 0
     evil = 0 #to change total evil matchups aswell
     if(col_player == 1 and row_player == 1): #both town
@@ -72,22 +70,20 @@ def update_player_matchup(column: int, row: int, col_player: int, row_player: in
         gap = 3
         evil = 4 - gap
     row = row + gap
-    cell = str(column) + str(row)
-    value = sheet[cell].value
+    cell = f"{get_column_letter(column)}{row}"
+    value = sheet[cell].value or 0
     value += 1
     sheet[cell].value = value
-    workbook.save()
-    workbook.save(path)
+    workbook.save('BotC-Stats.xlsx')
     if(evil == 0): # was on good team so no evil matchup to update
         return
     row = row + evil
-    cell = str(column) + str(row)
-    value = sheet[cell].value
+    cell = f"{get_column_letter(column)}{row}"
+    value = sheet[cell].value or 0
     value += 1
     sheet[cell].value = value
-    workbook.save()
-    workbook.save(path)
-
+    workbook.save('BotC-Stats.xlsx')
+    
 def update_stats(Data: array) -> None:
     i = 0
     Player = []
@@ -158,71 +154,30 @@ def replace_role_array_matchup(Role: array) ->array:
         role = entry
         FixedRole.append(find_role_matchup(role))
     return FixedRole
-
-def increment_col(string: str):
-    lst = list(string) 
-    result = []
-    while lst:
-        carry, next_ = increment_char(lst.pop())
-        result.append(next_)
-        if not carry:
-            break
-        if not lst:
-            result.append('A')   
-    result += lst[::-1]
-    return ''.join(result[::-1])
-
-def increment_char(char: chr):
-        if char in ('Z'):
-            return 1, 'A'
-        else:
-            return 0, chr(ord(char) + 1)
-
-def decrement_col(string: str):
-    lst = list(string)
-    result = []
-    index = 0
-    for char in lst:
-        if(char == lst[len(lst)-1]):
-            char = decrement_char(char)
-        if(char != 'ERROR'):
-            result.append(char)
-        index += 1
-    return ''.join(result)
-
-def decrement_char(char: chr):
-        if char in ('A'):
-            return 'ERROR'
-        else:
-            return chr(ord(char) - 1)
         
 def setup_class():
-    column = 'A'
+    column = 1
     row = 1
-    while(True):
-        cell = str(column) + str(row)
+    while True:
+        cell = f"{get_column_letter(column)}{row}"
         value = sheet[cell].value
-        match value:
-            case 'end':
-                break
-            case None:
-                pass
-            case _ if value not in ['Players', 'Total', 'Template']:
-                spreadsheetValues.player_list.append(value.lower())
-                spreadsheetValues.player_col_list.append(column)
-                row += 1
-                cell = str(column) + str(row)
-                value = sheet[cell].value
-                if(value is not None):
-                    spreadsheetValues.username_list.append(value.lower())
-                row -= 1
-                
-        column = increment_col(column) 
+        if value == 'end':
+            break
+        elif value and value not in ['Players', 'Total', 'Template']:
+            spreadsheetValues.player_list.append(value.lower())
+            spreadsheetValues.player_col_list.append(column)
+            row += 1
+            cell = f"{get_column_letter(column)}{row}"
+            value = sheet[cell].value
+            if value:
+                spreadsheetValues.username_list.append(value.lower())
+            row -= 1
+        column += 1
     spreadsheetValues.playercount = len(spreadsheetValues.player_list)
     
-    column = 'A'
+    column = 1
     while(True):
-        cell = str(column) + str(row)
+        cell = f"{get_column_letter(column)}{row}"
         value = sheet[cell].value
         match value:
             case 'roleend':
@@ -254,7 +209,7 @@ def setup_class():
     
     spreadsheetValues.matchup_row_start = row
     while(True):
-        cell = str(column) + str(row)
+        cell = f"{get_column_letter(column)}{row}"
         value = sheet[cell].value
         match value:
             case None:

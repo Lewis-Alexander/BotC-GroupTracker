@@ -7,8 +7,10 @@ from discord import app_commands
 from discord.ui import View, Button
 from discord.ext import commands
 from pathlib import Path
+from openpyxl.utils import get_column_letter
 from Spreadsheetclass import spreadsheetValues
 import csv
+import openpyxl
 
 bot = commands.Bot(command_prefix='!', intents = discord.Intents.all())
 
@@ -32,15 +34,14 @@ async def sync(ctx: commands.Context) -> None:
 @bot.tree.command(name="personal_average", description="Check your average winrates for sides")
 async def personal_average(interaction: discord.Interaction):
     column = Helper.find_player_username(interaction.user.name)
-    column = Helper.increment_col(column)
-    column = Helper.increment_col(column)
-    cell = str(column)+str(spreadsheetValues.average_good)
+    column += 2
+    cell = f"{get_column_letter(column)}{spreadsheetValues.average_good}"
     TotalGood = Helper.sheet[cell].value
-    cell = str(column)+str(spreadsheetValues.average_evil)
+    cell = f"{get_column_letter(column)}{spreadsheetValues.average_evil}"
     TotalEvil = Helper.sheet[cell].value
-    cell = str(column)+str(spreadsheetValues.average_total)
+    cell = f"{get_column_letter(column)}{spreadsheetValues.average_total}"
     Total = Helper.sheet[cell].value
-    cell = str(column)+str(spreadsheetValues.total_played)
+    cell = f"{get_column_letter(column)}{spreadsheetValues.total_played}"
     Played = Helper.sheet[cell].value
     await interaction.response.send_message(f"Over {str(Played)} games played your average winrate was {str(Total)} consisting of {str(TotalGood)} whilst good and {str(TotalEvil)} whilst evil!", ephemeral=True)
 
@@ -50,16 +51,16 @@ async def personal_average(interaction: discord.Interaction):
 @app_commands.describe(role = 'Role you would like to check (Townsfolk for Townsfolk total and Total Good for all good)')
 async def personal_role_stats(interaction: discord.Interaction, role: str):
     column = Helper.find_player_username(interaction.user.name)
-    column = Helper.decrement_col(column)
+    column -= 1
     row = Helper.find_role(role.lower())
     if(row == 0):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True)
     else:
         data = []
         for i in range(4):     
-            cell = str(column)+str(row)
+            cell = f"{get_column_letter(column)}{row}"
             data.append(Helper.sheet[cell].value)
-            column = Helper.increment_col(column)
+            column += 1
         await interaction.response.send_message(f'you have played the {role.capitalize()} {data[0]} times, of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.')
 
 @bot.tree.command(name="player_average", description="Check any players average winrates")
@@ -69,12 +70,11 @@ async def player_average(interaction: discord.Interaction, player: str):
     if(column == "ERROR"):
         await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
     else:
-        column = Helper.increment_col(column)
-        column = Helper.increment_col(column)
+        column += 2
         data = []
         rows = [spreadsheetValues.average_good,spreadsheetValues.average_evil,spreadsheetValues.average_total]
         for i in range(3):       
-            cell = str(column)+str(rows[i])
+            cell = f"{get_column_letter(column)}{rows[i]}"
             data.append(Helper.sheet[cell].value)
         await interaction.response.send_message(f'{player.capitalize()}\'s average winrates are as follows: Good-{data[0]} Evil-{data[1]} Total-{data[2]}')
 
@@ -89,9 +89,9 @@ async def role_total_stats(interaction: discord.Interaction, role: str):
         column = 'C'
         data = []
         for i in range(4):       
-                cell = str(column)+str(row)
+                cell = f"{get_column_letter(column)}{row}"
                 data.append(Helper.sheet[cell].value)
-                column = Helper.increment_col(column)
+                column += 1
         await interaction.response.send_message(f'The {role.capitalize()} has been played {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.')
 
 @bot.tree.command(name='player_role_stats', description="Check any players stats for a particular role")
@@ -107,9 +107,9 @@ async def player_role_stats(interaction: discord.Interaction, role: str, player:
     else:
         data = []
         for i in range(4):       
-                cell = str(column)+str(row)
+                cell = f"{get_column_letter(column)}{row}"
                 data.append(Helper.sheet[cell].value)
-                column = Helper.increment_col(column)
+                column += 1
         await interaction.response.send_message(f'{player.capitalize()} has played {role.capitalize()} {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)   
     
         
@@ -166,9 +166,8 @@ async def update_role(interaction : discord.Interaction):
     role100 = server.get_role(role_100_id)
     member = interaction.user
     column = Helper.find_player_username(member.name)
-    column = Helper.increment_col(column)
-    column = Helper.increment_col(column)
-    cell = column + str(spreadsheetValues.total_played)
+    column += 2
+    cell = f"{get_column_letter(column)}{spreadsheetValues.total_played}"
     cellval = Helper.sheet[cell].value
     if(cellval < 10):
         await member.add_roles(role0)
@@ -207,12 +206,12 @@ async def highest_role_winrate(interaction : discord.Interaction, role : str):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True)
     data = []
     for player in range (spreadsheetValues.playercount):
-        cell = str(column)+str(row)
+        cell = f"{get_column_letter(column)}{row}"
         tempdata = Helper.sheet[cell].value
         tempdata = tempdata[:-1]
         data.append(float(tempdata))
         for i in range(5):
-            column = Helper.increment_col(column)
+            column += 1
     unsorteddata = data.copy()
     data.sort(reverse=True)
     i = 0
@@ -226,8 +225,8 @@ async def highest_role_winrate(interaction : discord.Interaction, role : str):
         column = spreadsheetValues.starting_player_win_column
         for index in range(value):
             for i in range(5):
-                column = Helper.increment_col(column)
-        cell = str(column) + str(1)
+                column += 1
+        cell = f"{get_column_letter(column)}{1}"
         name.append(Helper.sheet[cell].value)
     if(len(name) > 1):
         players = f'Multiple players have a tied winrate of {data[0]}% on the {role.capitalize()} those being '
@@ -247,9 +246,8 @@ async def update_user_role(interaction: discord.Interaction, user: discord.Membe
     try:
         # Retrieve the column for the user
         column = Helper.find_player_username(user.name)
-        column = Helper.increment_col(column)
-        column = Helper.increment_col(column)
-        cell = column + str(spreadsheetValues.total_played)
+        column += 2
+        cell = f"{get_column_letter(column)}{spreadsheetValues.total_played}"
         cellval = Helper.sheet[cell].value
 
         # Define roles based on the algorithm in update_role
@@ -303,16 +301,15 @@ async def player_to_player_matchup_evil(interaction: discord.Interaction, player
     if(column == "ERROR" or row == "ERROR"):
         await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
     else:
-        column = Helper.increment_col(column)
-        column = Helper.increment_col(column)
+        column += 2
         row = row + 1 #start with minion info
-        cell = str(column)+str(row)
+        cell = f"{get_column_letter(column)}{row}"
         data = []
         for i in range(4):       
-                cell = str(column)+str(row)
+                cell = f"{get_column_letter(column)}{row}"
                 data.append(Helper.sheet[cell].value)
                 row = row + 1
-        await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are both minions their winrate is {data[0]}, if the second player is the demon or they both are demons their winrate is {data[1]}, if the first player is the demon and the second is one of the minions their winrate is {data[2]}, this means their average winrate as an evil team is {data[3]}.')
+        await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are both minions their winrate is {data[0]}, if {player2.capitalize()} is the demon or they both are demons their winrate is {data[1]}, if the {player1.capitalize()} is the demon and {player2.capitalize()} is one of the minions their winrate is {data[2]}, this means their average winrate as an evil team is {data[3]}.')
         
 @bot.tree.command(name="player_to_player_matchup_good", description="Check two players matchup stats when on the good team together first is the reference player")
 @app_commands.describe(player1 = 'Reference Player you would like to check (same name as on spreadsheet)')
@@ -323,10 +320,9 @@ async def player_to_player_matchup_good(interaction: discord.Interaction, player
     if(column == "ERROR" or row == "ERROR"):
         await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
     else:
-        column = Helper.increment_col(column)
-        column = Helper.increment_col(column)
+        column += 2
         row = row + 5 #start with correct info
-        cell = str(column)+str(row)    
+        cell = f"{get_column_letter(column)}{row}"    
         data = Helper.sheet[cell].value
         row = row + 1
         await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are both on the good team their winrate is {data}.')
@@ -340,10 +336,9 @@ async def player_to_player_matchup_total(interaction: discord.Interaction, playe
     if(column == "ERROR" or row == "ERROR"):
         await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
     else:
-        column = Helper.increment_col(column)
-        column = Helper.increment_col(column)
+        column += 2
         row = row + 6 #start with correct info
-        cell = str(column)+str(row)    
+        cell = f"{get_column_letter(column)}{row}"    
         data = Helper.sheet[cell].value
         row = row + 1
         await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are both on the same team their winrate is {data}.')
@@ -358,17 +353,16 @@ async def player_to_player_winrate_delta(interaction: discord.Interaction, playe
     if(column == "ERROR" or row == "ERROR"):
         await interaction.response.send_message(f'Player not found please check spelling', ephemeral=True)
     else:
-        column = Helper.increment_col(column)
-        column = Helper.increment_col(column)
+        column += 2
         row = row + 7 #start with correct info
-        cell = str(column)+str(row)
+        cell = f"{get_column_letter(column)}{row}"
         data = []
         for i in range(3):       
-                cell = str(column)+str(row)
+                cell = f"{get_column_letter(column)}{row}"
                 data.append(Helper.sheet[cell].value)
                 row = row + 1
         data[2] = data[2]*100
-        await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are on the evil team together the first players default evil winrate changes by {data[0]} (absolute), if they are together on the good team their winrate changes by {data[1]} (absolute), on average if both players are on the same team the first players average winrate delta is an absolute value of {data[2]}%.')
+        await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are on the evil team together {player1.capitalize()}\'s default evil winrate changes by {data[0]} (absolute), if they are together on the good team their winrate changes by {data[1]} (absolute), on average if both players are on the same team {player1.capitalize()}\'s average winrate delta is an absolute value of {data[2]}%.')
 
 # reused for both fun and strength comparisons
 async def send_new_comparison(interaction: discord.Interaction, is_initial: bool, category: str, message_text: str):
@@ -600,10 +594,25 @@ async def copy_results(interaction: discord.Interaction):
             await interaction.response.send_message("Please select a session or create a new one:", view=SessionDropdownView(), ephemeral=True)
     except discord.errors.NotFound:
         await interaction.response.send_message("Please select a session or create a new one:", view=SessionDropdownView(), ephemeral=True)
+
+@commands.is_owner()
+@bot.tree.command(name="reload_workbook", description="Save, close, and reopen the Excel sheet this is to ensure data is refreshed properly after data insertion")
+async def reload_workbook(interaction: discord.Interaction):
+    try:
+        Helper.workbook.save("BotC-Stats.xlsx")
+        Helper.workbook.close()
+
+        Helper.workbook = openpyxl.load_workbook("BotC-Stats.xlsx", data_only=True)
+        Helper.sheet = Helper.workbook["Sheet1"]
+
+        await interaction.response.send_message("Workbook has been reloaded in data_only mode.", ephemeral=True)
+    except Exception as e:
+        await interaction.response.send_message(f"Failed to reload workbook: {str(e)}", ephemeral=True)
+
 @bot.event
 async def on_ready():
     Helper.setup_class()
-    await bot.get_channel(bot_channel_id).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
+    #await bot.get_channel(bot_channel_id).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
 
 
 bot.run(token)
