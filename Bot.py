@@ -2,7 +2,8 @@ import discord
 import Helper
 import Pairwise
 import random
-from Token import token, bot_channel_id, server_id, role_0_id, role_10_id, role_20_id, role_40_id, role_60_id, role_80_id, role_100_id
+import traceback
+from Token import token, bot_channel_id, server_id, role_0_id, role_10_id, role_20_id, role_40_id, role_60_id, role_80_id, role_100_id, error_user_id
 from discord import app_commands
 from discord.ui import View, Button
 from discord.ext import commands
@@ -13,6 +14,58 @@ import csv
 import openpyxl
 
 bot = commands.Bot(command_prefix='!', intents = discord.Intents.all())
+
+async def send_error_to_discord(error: Exception, context: str = ""):
+    """Send an error message to the specified Discord user."""
+    if error_user_id is None:
+        print(f"Error notification not configured. error_user_id is not set in Token.py")
+        print(f"Error in {context}: {str(error)}")
+        print(traceback.format_exc())
+        return
+    
+    try:
+        user = await bot.fetch_user(error_user_id)
+        error_message = f"**Error occurred{' in ' + context if context else ''}:**\n\n"
+        error_message += f"```\n{str(error)}\n```\n"
+        error_message += f"**Traceback:**\n```\n{traceback.format_exc()}\n```"
+        
+        # Discord has a 2000 character limit, so split if necessary
+        if len(error_message) > 2000:
+            # Send the main error message
+            await user.send(error_message[:2000])
+            # Send the rest
+            await user.send(error_message[2000:])
+        else:
+            await user.send(error_message)
+    except Exception as e:
+        print(f"Failed to send error notification to Discord user: {str(e)}")
+        print(f"Original error: {str(error)}")
+
+@bot.event
+async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+    """Global error handler for app commands."""
+    await send_error_to_discord(error, f"Command: {interaction.command.name if interaction.command else 'Unknown'}")
+    
+    # Respond to the user if possible
+    try:
+        if not interaction.response.is_done():
+            await interaction.response.send_message(
+                f"An error occurred while processing your command. The error has been logged.",
+                ephemeral=True
+            )
+        else:
+            await interaction.followup.send(
+                f"An error occurred while processing your command. The error has been logged.",
+                ephemeral=True
+            )
+    except:
+        pass
+
+@bot.event
+async def on_error(event, *args, **kwargs):
+    """Global error handler for events."""
+    error = Exception(f"Error in event: {event}")
+    await send_error_to_discord(error, f"Event: {event}")
 
 @bot.event
 async def on_ready():
@@ -124,25 +177,35 @@ async def update_spreadsheet(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     my_file = Path("Results.csv")
     if my_file.is_file():
+        Helper.open_workbook_edit()
+
         data = Helper.separate_file()
 
         invalid_entries = []
-        for row in data:
-            player, role = row[0], row[1]
-            if Helper.find_player(player.lower()) == "ERROR":
-                invalid_entries.append(f"Player: {player}")
-            if Helper.find_role(role.lower()) == "ERROR":
-                invalid_entries.append(f"Role: {role}")
-
+        for index, entry in enumerate(data):
+            if index == 0:
+                continue
+            else:
+                if index % 2 == 0:
+                    if entry[0].lower() not in spreadsheetValues.role_list:
+                        invalid_entries.append(f"Role: {entry}")
+                else:
+                    if entry[0].lower() not in spreadsheetValues.player_list:
+                        invalid_entries.append(f"Player: {entry}")
+                        
         if invalid_entries:
             error_message = "Invalid entries found: " + ", ".join(invalid_entries)
             await interaction.followup.send(error_message, ephemeral=True)
+            # Close the edit workbook without saving
+            Helper.close_workbook_edit()
             return
 
         Helper.update_stats(data)
-        await interaction.followup.send(f'spreadsheet updated', ephemeral=True)
+        Helper.close_workbook_edit()
+        Helper.recalculate_and_cache_workbook()
+        Helper.refresh_data_workbook()
 
-        await copy_results(interaction)
+        await interaction.followup.send(f'spreadsheet updated', ephemeral=True)
 
 @commands.is_owner()  # Prevent other people from using the command
 @bot.tree.command(name="update_matchups", description="if program has a csv file it uses it to update the spreadsheet")
@@ -150,8 +213,14 @@ async def update_matchups(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     my_file = Path("Results.csv")
     if my_file.is_file():
+        Helper.open_workbook_edit()
+
         data = Helper.separate_file()
         Helper.update_matchups(data)
+        Helper.close_workbook_edit()
+        Helper.recalculate_and_cache_workbook()
+        Helper.refresh_data_workbook()
+
         await interaction.followup.send(f'matchups updated', ephemeral=True)      
 
 @bot.tree.command(name="update_role", description="auto update personal role from database")
@@ -595,24 +664,10 @@ async def copy_results(interaction: discord.Interaction):
     except discord.errors.NotFound:
         await interaction.response.send_message("Please select a session or create a new one:", view=SessionDropdownView(), ephemeral=True)
 
-@commands.is_owner()
-@bot.tree.command(name="reload_workbook", description="Save, close, and reopen the Excel sheet this is to ensure data is refreshed properly after data insertion")
-async def reload_workbook(interaction: discord.Interaction):
-    try:
-        Helper.workbook.save("BotC-Stats.xlsx")
-        Helper.workbook.close()
-
-        Helper.workbook = openpyxl.load_workbook("BotC-Stats.xlsx", data_only=True)
-        Helper.sheet = Helper.workbook["Sheet1"]
-
-        await interaction.response.send_message("Workbook has been reloaded in data_only mode.", ephemeral=True)
-    except Exception as e:
-        await interaction.response.send_message(f"Failed to reload workbook: {str(e)}", ephemeral=True)
-
 @bot.event
 async def on_ready():
     Helper.setup_class()
-    #await bot.get_channel(bot_channel_id).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
+    await bot.get_channel(bot_channel_id).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
 
 
 bot.run(token)

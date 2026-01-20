@@ -1,2 +1,4 @@
 discord
 openpyxl
+pywin32; sys_platform == 'win32'
+uno; sys_platform != 'win32'

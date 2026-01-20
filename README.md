@@ -3,10 +3,9 @@
 Python
 
 pip dependencies:
-  - xlwings
+  - openpyxl
   - discord.py
-
-Excel with a valid microsoft account
+  - pywin32/uno depending on OS will auto install correct one
 
 ***Explanation***
 
@@ -52,6 +51,7 @@ pip install -r requirements.txt
   role_60_id = roleinserverfor60games
   role_80_id = roleinserverfor80games
   role_100_id = roleinserverfor100games
+  error_user_id = youruserID
 ```
   - Open BotcStats.xls then replace all but one of the template sections with your players make sure to paste in the players usernames below their names in the spreadsheet, when you need to add a new player copy the remaining template then insert before that template column you will also need to repeat for the template column in the matchup section (By default i assume that you will move the empty space for self to self matchups if you dont want to bother with that fill in the empty slot in the template). You will also need to check that the total column has properly continued the parttern (it should but excel doesnt like being consistent sometimes).
   - Save the excel sheet then close it
@@ -62,11 +62,14 @@ Run Bot.py, the bot should specify when it is ready in the channel you specified
 The bot will also open excel it needs to be open for the code to work.
 Type / then the options should show in the menu if not run !sync and ctrl r to force refresh the discord app.
 When you want to push the spreadsheet make sure to close it as otherwise you will be pushing a temporary copy.
+if any errors occur it will DM whichever userID is saved in the token file (to allow for the bot to be run on a server)
 
 **Add games played**
   - When you finish a game fill in results.csv with the winning team (1 for good wins 0 for evil wins) the players and the roles (ensure to place these in quotation marks) then save it.
-  - run /update_spreadsheet it should show a bot thinking, then show update successful Finally it will prompt you whether to save the results in an already existing Session directory or whether to create a new one.
+  - run /update_spreadsheet it should show a bot thinking, then show update successful.
+  - run /copy_results
   - you can check whether everything was updated succesfully in the excel sheet.
+  - run /copy_results to move the results to historical results
   - upload_all_session_csvs (allows a user to see all games in a particular session)
 
 **Other owner exclusive commands**
