@@ -91,7 +91,7 @@ def refresh_data_workbook():
     sheet = workbook['Sheet1']
 
 def separate_file() -> array:
-    with open('results.csv', newline='') as csvfile:
+    with open('Results.csv', newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         Data = []
         for row in reader:
