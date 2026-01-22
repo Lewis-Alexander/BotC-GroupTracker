@@ -441,6 +441,10 @@ async def send_new_comparison(interaction: discord.Interaction, is_initial: bool
 
         role1, role2 = random.sample(spreadsheetValues.role_list, 2)
 
+        # preventing homebrew since they are non specific
+        while "homebrew" in role1.lower() or "homebrew" in role2.lower():
+            role1, role2 = random.sample(spreadsheetValues.role_list, 2)
+
         async def button_callback(interaction: discord.Interaction, selected_role: str):
             await interaction.response.edit_message(content="Loading next comparison...", view=None)
             Pairwise.save_pairwise_comparison(role1, role2, selected_role, category=category)
@@ -476,9 +480,6 @@ async def send_new_comparison(interaction: discord.Interaction, is_initial: bool
         role1_rules = Helper.get_role_rules(role1)
         role2_rules = Helper.get_role_rules(role2)
 
-        # preventing homebrew since they are non specific
-        while "homebrew" in role1.lower() or "homebrew" in role2.lower():
-            role1, role2 = random.sample(spreadsheetValues.role_list, 2)
 
         # Update images and rules after ensuring valid roles
         role1_image = Helper.get_role_image(role1)
@@ -765,9 +766,9 @@ async def on_ready():
     Helper.setup_class()
     await bot.get_channel(bot_channel_id).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
 
-
-try:
-    bot.run(token)
-except Exception as e:
-    print(f"Fatal error occurred: {str(e)}")
-    print(traceback.format_exc())
+if __name__ == "__main__":
+    try:
+        bot.run(token)
+    except Exception as e:
+        print(f"Fatal error occurred: {str(e)}")
+        print(traceback.format_exc())
