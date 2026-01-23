@@ -492,12 +492,6 @@ async def send_new_comparison(interaction: discord.Interaction, is_initial: bool
         role1_rules = Helper.get_role_rules(role1)
         role2_rules = Helper.get_role_rules(role2)
 
-        # Update images and rules after ensuring valid roles
-        role1_image = Helper.get_role_image(role1)
-        role2_image = Helper.get_role_image(role2)
-        role1_rules = Helper.get_role_rules(role1)
-        role2_rules = Helper.get_role_rules(role2)
-
         files = []
         content = message_text
         if role1_image:
