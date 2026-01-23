@@ -240,11 +240,11 @@ def replace_role_array_matchup(Role: array) ->array:
 def setup_class():
     column = 1
     row = 1
-    spreadsheetValues.player_list = []
-    spreadsheetValues.player_col_list = []
-    spreadsheetValues.username_list = []
-    spreadsheetValues.role_list = []
-    spreadsheetValues.role_list_idx = []
+    spreadsheetValues.player_list.clear()
+    spreadsheetValues.player_col_list.clear()
+    spreadsheetValues.username_list.clear()
+    spreadsheetValues.role_list.clear()
+    spreadsheetValues.role_list_idx.clear()
     while True:
         cell = f"{get_column_letter(column)}{row}"
         value = sheet[cell].value

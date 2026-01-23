@@ -41,6 +41,7 @@ async def send_error_to_discord(error: Exception, context: str = ""):
         print(f"Failed to send error notification to Discord user: {str(e)}")
         print(f"Original error: {str(error)}")
 
+
 @bot.event
 async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     """Global error handler for app commands."""
@@ -61,16 +62,19 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
     except:
         pass
 
+
 @bot.event
 async def on_error(event, *args, **kwargs):
     """Global error handler for events."""
     error = Exception(f"Error in event: {event}")
     await send_error_to_discord(error, f"Event: {event}")
 
+
 @bot.event
 async def on_ready():
     print(f'Running as {bot.user}')
     print(bot.user.id)
+
 
 @bot.command()
 @commands.guild_only()
@@ -99,7 +103,6 @@ async def personal_average(interaction: discord.Interaction):
     await interaction.response.send_message(f"Over {str(Played)} games played your average winrate was {str(Total)} consisting of {str(TotalGood)} whilst good and {str(TotalEvil)} whilst evil!", ephemeral=True)
 
 
-
 @bot.tree.command(name="personal_role_stats", description="Check any your stats for a particular role")
 @app_commands.describe(role = 'Role you would like to check (Townsfolk for Townsfolk total and Total Good for all good)')
 async def personal_role_stats(interaction: discord.Interaction, role: str):
@@ -115,6 +118,7 @@ async def personal_role_stats(interaction: discord.Interaction, role: str):
             data.append(Helper.sheet[cell].value)
             column += 1
         await interaction.response.send_message(f'you have played the {role.capitalize()} {data[0]} times, of those you won {data[1]} and lost {data[2]} which makes your winrate {data[3]}.')
+
 
 @bot.tree.command(name="player_average", description="Check any players average winrates")
 @app_commands.describe(player = 'Player you would like to see the averages for')
@@ -139,13 +143,14 @@ async def role_total_stats(interaction: discord.Interaction, role: str):
     if(row == "ERROR"):
         await interaction.response.send_message(f'Role not found please check spelling', ephemeral=True) 
     else: 
-        column = 'C'
+        column = 3
         data = []
         for i in range(4):       
                 cell = f"{get_column_letter(column)}{row}"
                 data.append(Helper.sheet[cell].value)
                 column += 1
         await interaction.response.send_message(f'The {role.capitalize()} has been played {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.')
+
 
 @bot.tree.command(name='player_role_stats', description="Check any players stats for a particular role")
 @app_commands.describe(role = 'Role you would like to check, (Townsfolk for Townsfolk total and Total Good for all good)')
@@ -166,10 +171,10 @@ async def player_role_stats(interaction: discord.Interaction, role: str, player:
         await interaction.response.send_message(f'{player.capitalize()} has played {role.capitalize()} {data[0]} times of those they won {data[1]} and lost {data[2]} which makes their winrate {data[3]}.', ephemeral=True)   
     
         
-
 @bot.tree.command(name="upload_spreadsheet", description="Uploads the current entire spreadsheet to be perused at your pleasure")
 async def upload_spreadsheet(interaction: discord.Interaction):
     await interaction.response.send_message(file=discord.File(r'BotC-Stats.xlsx'))
+
 
 @commands.is_owner()  # Prevent other people from using the command
 @bot.tree.command(name="update_spreadsheet", description="if program has a csv file it uses it to update the spreadsheet")
@@ -207,6 +212,7 @@ async def update_spreadsheet(interaction: discord.Interaction):
 
         await interaction.followup.send(f'spreadsheet updated', ephemeral=True)
 
+
 @commands.is_owner()  # Prevent other people from using the command
 @bot.tree.command(name="update_matchups", description="if program has a csv file it uses it to update the spreadsheet")
 async def update_matchups(interaction: discord.Interaction):
@@ -222,6 +228,7 @@ async def update_matchups(interaction: discord.Interaction):
         Helper.refresh_data_workbook()
 
         await interaction.followup.send(f'matchups updated', ephemeral=True)      
+
 
 @bot.tree.command(name="update_role", description="auto update personal role from database")
 async def update_role(interaction : discord.Interaction):
@@ -265,6 +272,7 @@ async def update_role(interaction : discord.Interaction):
         await member.add_roles(role100)
         await member.remove_roles(role80)
         await interaction.response.send_message(f'You have been assigned the 100+ games role as you have attended enough to increase you currently have {cellval} games played.', ephemeral=True)
+
         
 @bot.tree.command(name="highest_role_winrate", description="highest winrate for each role")
 @app_commands.describe(role = 'Role you would like to check (Townsfolk for Townsfolk total and Total Good for all good)')
@@ -307,6 +315,7 @@ async def highest_role_winrate(interaction : discord.Interaction, role : str):
         await interaction.response.send_message(f'{players}')
     else:
         await interaction.response.send_message(f'{name[0].capitalize()} has the highest winrate as the/a {role.capitalize()} which is {data[0]}%')
+
     
 @commands.is_owner()  # Prevent other people from using the command
 @bot.tree.command(name="update_user_role", description="Update the role for a given user")
@@ -361,6 +370,7 @@ async def update_user_role(interaction: discord.Interaction, user: discord.Membe
         # Handle any errors that occur
         await interaction.response.send_message(f"Failed to update role: {str(e)}", ephemeral=True)
 
+
 @bot.tree.command(name="player_to_player_matchup_evil", description="Check two players matchup stats when on the evil team together first is the reference player")
 @app_commands.describe(player1 = 'Player you would like to check (same name as on spreadsheet)')
 @app_commands.describe(player2 = 'Player you would like to check (same name as on spreadsheet)')
@@ -379,6 +389,7 @@ async def player_to_player_matchup_evil(interaction: discord.Interaction, player
                 data.append(Helper.sheet[cell].value)
                 row = row + 1
         await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are both minions their winrate is {data[0]}, if {player2.capitalize()} is the demon or they both are demons their winrate is {data[1]}, if the {player1.capitalize()} is the demon and {player2.capitalize()} is one of the minions their winrate is {data[2]}, this means their average winrate as an evil team is {data[3]}.')
+
         
 @bot.tree.command(name="player_to_player_matchup_good", description="Check two players matchup stats when on the good team together first is the reference player")
 @app_commands.describe(player1 = 'Reference Player you would like to check (same name as on spreadsheet)')
@@ -395,6 +406,7 @@ async def player_to_player_matchup_good(interaction: discord.Interaction, player
         data = Helper.sheet[cell].value
         row = row + 1
         await interaction.response.send_message(f'when {player1.capitalize()} and {player2.capitalize()} are both on the good team their winrate is {data}.')
+
         
 @bot.tree.command(name="player_to_player_matchup_total", description="Check two players matchup stats when on the same team, first is the reference player")
 @app_commands.describe(player1 = 'Reference Player you would like to check (same name as on spreadsheet)')
@@ -480,7 +492,6 @@ async def send_new_comparison(interaction: discord.Interaction, is_initial: bool
         role1_rules = Helper.get_role_rules(role1)
         role2_rules = Helper.get_role_rules(role2)
 
-
         # Update images and rules after ensuring valid roles
         role1_image = Helper.get_role_image(role1)
         role2_image = Helper.get_role_image(role2)
@@ -509,14 +520,17 @@ async def send_new_comparison(interaction: discord.Interaction, is_initial: bool
             await interaction.followup.send(
                 content=content, view=view, files=files, ephemeral=True
             )
+
     
 @bot.tree.command(name="role_fun_comparison", description="Randomly select two roles and ask which is more fun to play as/against")
 async def role_fun_comparison(interaction: discord.Interaction):
     await send_new_comparison(interaction, is_initial=True, category="fun", message_text="Which role is more fun to play as/against?")
+
     
 @bot.tree.command(name="role_strength_comparison", description="Randomly select two roles and ask which is in your view stronger")
 async def role_strength_comparison(interaction: discord.Interaction):
     await send_new_comparison(interaction, is_initial=True, category="strength", message_text="Which role is stronger?")
+
 
 @bot.tree.command(name="role_ranking", description="Display a ranking of roles based on pairwise comparisons")
 @app_commands.choices(category=[
@@ -543,7 +557,8 @@ async def role_ranking(interaction: discord.Interaction, category: app_commands.
         content="The role ranking is too long to display here. Please find the ranking in the attached CSV file.",
         file=discord.File(csv_file_path)
     )
-    
+
+   
 @bot.tree.command(name="get_role", description="Get the data for a specific role")
 async def get_role(interaction: discord.Interaction, role: str):
     rules_path = Helper.get_role_rules(role)
@@ -591,6 +606,7 @@ async def upload_all_session_csvs(interaction: discord.Interaction):
             self.add_item(SessionDropdown())
 
     await interaction.response.send_message("Please select a session:", view=SessionDropdownView(), ephemeral=True)
+
 
 @commands.is_owner()  # Prevent other people from using the command    
 @bot.tree.command(name="copy_results", description="Copy Results.csv to a selected session directory or create a new session directory")
@@ -664,6 +680,7 @@ async def copy_results(interaction: discord.Interaction):
             await interaction.response.send_message("Please select a session or create a new one:", view=SessionDropdownView(), ephemeral=True)
     except discord.errors.NotFound:
         await interaction.response.send_message("Please select a session or create a new one:", view=SessionDropdownView(), ephemeral=True)
+
 
 @commands.is_owner()
 @bot.tree.command(name="initialize_results", description="Clear Results.csv and set the winning team (1=Good, 0=Evil)")
@@ -765,6 +782,7 @@ async def upload_cur_results(interaction: discord.Interaction):
 async def on_ready():
     Helper.setup_class()
     await bot.get_channel(bot_channel_id).send(f"Bot is running and has loaded all current players and roles from the spreadsheet currently {len(spreadsheetValues.username_list)} players and {spreadsheetValues.rolecount} roles.")
+
 
 if __name__ == "__main__":
     try:

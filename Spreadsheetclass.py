@@ -8,10 +8,10 @@ class spreadsheetValuesClass:
         self._minion = 138
         self._demon = 163
         self._total_played = 167
-        self._win_column_total = 'D' #should never change so no need to include in setters for now
-        self._starting_player_win_column = 'I' #should never change so no need to include in setters for now
-        self._total_percentage_column = 'F' #should never change so no need to include in setters for now
-        self._starting_player_percentage_column = 'K' #should never change so no need to include in setters for now
+        self._win_column_total = 4 #should never change so no need to include in setters for now
+        self._starting_player_win_column = 9 #should never change so no need to include in setters for now
+        self._total_percentage_column = 6 #should never change so no need to include in setters for now
+        self._starting_player_percentage_column = 11 #should never change so no need to include in setters for now
         self._playercount = 36
         self._rolecount = 0 #dont actually know current number of roles, set during setup
         self._matchup_row_start = 171
